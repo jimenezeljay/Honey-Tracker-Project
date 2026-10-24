@@ -68,3 +68,14 @@ $verified-light: #C9D6B8;   // icon on the dark sage fill
 .badge-status-pending   { background: #F3E3C3;          color: $amber-deep; }
 .badge-status-approved  { background: rgba($sage, .25); color: #4A5440; }
 .badge-status-suspended { background: #F6D9D4;          color: #8A2A1B; }
+
+// Tooltips (badge names on product cards): site ink instead of Bootstrap's black
+.tooltip {
+  --bs-tooltip-bg: #{$ink};
+  --bs-tooltip-color: #fff;
+  --bs-tooltip-font-size: .8rem;
+  --bs-tooltip-border-radius: #{$border-radius};
+  --bs-tooltip-padding-x: .6rem;
+  --bs-tooltip-padding-y: .3rem;
+  font-weight: 600;
+}

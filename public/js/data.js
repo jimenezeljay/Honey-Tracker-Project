@@ -64,18 +64,19 @@ const MOCK = {
     { farmId: 6, flowers: ['Orange blossom', 'Saw palmetto'],      pesticideNotes: 'Grove spray schedule shared with keeper.' }
   ],
 
+  // texture: 'liquid', 'crystallized' or 'creamed' (only one; keepers update it if the honey crystallizes later)
   // flags: 'creamed', 'single-hive'
   batches: [
-    { id: 1,  batchNumber: '0001', hiveIds: [1, 2, 3], harvestDate: '2026-06-14', season: 'Spring 2026', quantityLb: 40,  honeyType: 'Wildflower',     flowerTypes: ['Clover', 'Aster'],          flags: [],                       notes: '', traceUrl: 'product.html?id=1' },
-    { id: 2,  batchNumber: '0002', hiveIds: [1, 2],    harvestDate: '2026-09-02', season: 'Fall 2026',   quantityLb: 32,  honeyType: 'Goldenrod',      flowerTypes: ['Goldenrod', 'Aster'],       flags: ['creamed'],              notes: '', traceUrl: 'product.html?id=2' },
-    { id: 3,  batchNumber: '0003', hiveIds: [4, 5],    harvestDate: '2026-05-28', season: 'Spring 2026', quantityLb: 55,  honeyType: 'Wildflower',     flowerTypes: ['Apple', 'Dandelion'],       flags: [],                       notes: '', traceUrl: 'product.html?id=3' },
-    { id: 4,  batchNumber: '0004', hiveIds: [4, 5],    harvestDate: '2026-07-20', season: 'Summer 2026', quantityLb: 48,  honeyType: 'Clover',         flowerTypes: ['Clover'],                   flags: ['creamed'],              notes: '', traceUrl: 'product.html?id=4' },
-    { id: 5,  batchNumber: '0005', hiveIds: [6],       harvestDate: '2026-06-30', season: 'Summer 2026', quantityLb: 22,  honeyType: 'Wildflower',     flowerTypes: ['Wildflowers', 'Black locust'], flags: ['single-hive'],       notes: '', traceUrl: 'product.html?id=5' },
-    { id: 6,  batchNumber: '0006', hiveIds: [7, 8],    harvestDate: '2026-08-25', season: 'Summer 2026', quantityLb: 60,  honeyType: 'Buckwheat',      flowerTypes: ['Buckwheat'],                flags: [],                       notes: '', traceUrl: 'product.html?id=6' },
-    { id: 7,  batchNumber: '0007', hiveIds: [9, 10],   harvestDate: '2026-07-12', season: 'Summer 2026', quantityLb: 70,  honeyType: 'Basswood',       flowerTypes: ['Basswood'],                 flags: [],                       notes: '', traceUrl: 'product.html?id=7' },
-    { id: 8,  batchNumber: '0008', hiveIds: [9],       harvestDate: '2026-09-15', season: 'Fall 2026',   quantityLb: 18,  honeyType: 'Goldenrod',      flowerTypes: ['Goldenrod', 'Fireweed'],    flags: ['single-hive', 'creamed'], notes: '', traceUrl: 'product.html?id=8' },
-    { id: 9,  batchNumber: '0009', hiveIds: [11],      harvestDate: '2026-04-10', season: 'Spring 2026', quantityLb: 90,  honeyType: 'Orange blossom', flowerTypes: ['Orange blossom'],           flags: ['single-hive'],          notes: '', traceUrl: 'product.html?id=9' },
-    { id: 10, batchNumber: '0010', hiveIds: [7],       harvestDate: '2026-06-05', season: 'Spring 2026', quantityLb: 25,  honeyType: 'Clover',         flowerTypes: ['Clover', 'Alfalfa'],        flags: ['single-hive'],          notes: '', traceUrl: 'product.html?id=10' }
+    { id: 1,  batchNumber: '0001', hiveIds: [1, 2, 3], harvestDate: '2026-06-14', season: 'Spring 2026', quantityLb: 40,  honeyType: 'Wildflower', texture: 'liquid',     flowerTypes: ['Clover', 'Aster'],          flags: [],                       notes: '', traceUrl: 'product.html?id=1' },
+    { id: 2,  batchNumber: '0002', hiveIds: [1, 2],    harvestDate: '2026-09-02', season: 'Fall 2026',   quantityLb: 32,  honeyType: 'Goldenrod', texture: 'creamed',      flowerTypes: ['Goldenrod', 'Aster'],       flags: ['creamed'],              notes: '', traceUrl: 'product.html?id=2' },
+    { id: 3,  batchNumber: '0003', hiveIds: [4, 5],    harvestDate: '2026-05-28', season: 'Spring 2026', quantityLb: 55,  honeyType: 'Wildflower', texture: 'crystallized',     flowerTypes: ['Apple', 'Dandelion'],       flags: [],                       notes: '', traceUrl: 'product.html?id=3' },
+    { id: 4,  batchNumber: '0004', hiveIds: [4, 5],    harvestDate: '2026-07-20', season: 'Summer 2026', quantityLb: 48,  honeyType: 'Clover', texture: 'creamed',         flowerTypes: ['Clover'],                   flags: ['creamed'],              notes: '', traceUrl: 'product.html?id=4' },
+    { id: 5,  batchNumber: '0005', hiveIds: [6],       harvestDate: '2026-06-30', season: 'Summer 2026', quantityLb: 22,  honeyType: 'Wildflower', texture: 'liquid',     flowerTypes: ['Wildflowers', 'Black locust'], flags: ['single-hive'],       notes: '', traceUrl: 'product.html?id=5' },
+    { id: 6,  batchNumber: '0006', hiveIds: [7, 8],    harvestDate: '2026-08-25', season: 'Summer 2026', quantityLb: 60,  honeyType: 'Buckwheat', texture: 'crystallized',      flowerTypes: ['Buckwheat'],                flags: [],                       notes: '', traceUrl: 'product.html?id=6' },
+    { id: 7,  batchNumber: '0007', hiveIds: [9, 10],   harvestDate: '2026-07-12', season: 'Summer 2026', quantityLb: 70,  honeyType: 'Basswood', texture: 'liquid',       flowerTypes: ['Basswood'],                 flags: [],                       notes: '', traceUrl: 'product.html?id=7' },
+    { id: 8,  batchNumber: '0008', hiveIds: [9],       harvestDate: '2026-09-15', season: 'Fall 2026',   quantityLb: 18,  honeyType: 'Goldenrod', texture: 'creamed',      flowerTypes: ['Goldenrod', 'Fireweed'],    flags: ['single-hive', 'creamed'], notes: '', traceUrl: 'product.html?id=8' },
+    { id: 9,  batchNumber: '0009', hiveIds: [11],      harvestDate: '2026-04-10', season: 'Spring 2026', quantityLb: 90,  honeyType: 'Orange blossom', texture: 'liquid', flowerTypes: ['Orange blossom'],           flags: ['single-hive'],          notes: '', traceUrl: 'product.html?id=9' },
+    { id: 10, batchNumber: '0010', hiveIds: [7],       harvestDate: '2026-06-05', season: 'Spring 2026', quantityLb: 25,  honeyType: 'Clover', texture: 'liquid',         flowerTypes: ['Clover', 'Alfalfa'],        flags: ['single-hive'],          notes: '', traceUrl: 'product.html?id=10' }
   ],
 
   // Pollen profile per batch (percent adds up to 100). Product page pie chart.
@@ -131,6 +132,7 @@ function listingView(listing) {
     lat: farm.lat,
     lng: farm.lng,
     honeyType: batch.honeyType,
+    texture: batch.texture,
     season: batch.season,
     harvestDate: batch.harvestDate,
     flags: batch.flags

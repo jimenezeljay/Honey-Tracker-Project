@@ -38,6 +38,7 @@ if (cardGrid) {
   cardGrid.innerHTML = sampleListings
     .map(listing => `<div class="col-sm-6 col-lg-4">${productCard(listing)}</div>`)
     .join('');
+  initTooltips(cardGrid);
 }
 
 // Toast demo
