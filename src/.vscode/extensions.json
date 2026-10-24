@@ -1,0 +1,9 @@
+// These are the extensions that I added for php to work + some database tools
+{
+  "recommendations": [
+    "bmewburn.vscode-intelephense-client",
+    "xdebug.php-debug",
+    "mtxr.sqltools",
+    "mtxr.sqltools-driver-pg"
+  ]
+}
