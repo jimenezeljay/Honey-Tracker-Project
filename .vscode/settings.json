@@ -1,0 +1,4 @@
+{
+  // Live Server ("Go Live") serves the site from public/, the same folder GitHub Pages publishes
+  "liveServer.settings.root": "/public"
+}
