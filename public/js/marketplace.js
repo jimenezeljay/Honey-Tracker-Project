@@ -1,7 +1,7 @@
 // Marketplace (wireframe 4): filter and sort the honey listings.
 // Needs js/components.js (productCard, BADGES) and js/data.js (getListings) loaded first.
 //
-// Filters live in the URL (?type=Clover&state=OH&verified=1&badges=certified,raw&sort=price)
+// Filters live in the URL (?type=Clover&texture=creamed&state=OH&verified=1&badges=certified,raw&sort=price)
 // so a filtered view can be shared or linked to, e.g. from a farm on the map.
 
 (function () {
@@ -11,6 +11,7 @@
 
   const el = {
     type: document.getElementById('typeSelect'),
+    texture: document.getElementById('textureSelect'),
     verified: document.getElementById('verifiedOnly'),
     badgeChecks: document.getElementById('badgeChecks'),
     state: document.getElementById('stateSelect'),
@@ -31,8 +32,9 @@
   // Placeholder: Steubenville, OH. Later this could come from a ZIP the shopper enters.
   let origin = { lat: 40.36, lng: -80.63, label: 'Steubenville, OH' };
 
-  // Volunteer-Verified has its own switch, so it isn't repeated in the badge list.
-  const BADGE_FILTERS = Object.keys(BADGES).filter(key => key !== 'volunteer-verified');
+  // Volunteer-Verified has its own switch and Creamed is in the Texture dropdown,
+  // so neither is repeated in the badge list.
+  const BADGE_FILTERS = Object.keys(BADGES).filter(key => key !== 'volunteer-verified' && key !== 'creamed');
 
   let listings = [];
 
@@ -70,6 +72,7 @@
     const number = name => (data.get(name) === '' || data.get(name) === null ? null : Number(data.get(name)));
     return {
       type: data.get('type') || '',
+      texture: data.get('texture') || '',
       verified: data.has('verified'),
       badges: data.getAll('badges'),
       state: data.get('state') || '',
@@ -87,6 +90,7 @@
       if (value && [...select.options].some(o => o.value === value)) select.value = value;
     };
     setSelect(el.type, params.get('type'));
+    setSelect(el.texture, params.get('texture'));
     setSelect(el.state, params.get('state'));
     setSelect(el.season, params.get('season'));
     setSelect(el.sort, params.get('sort'));
@@ -103,6 +107,7 @@
   function writeUrl(f) {
     const params = new URLSearchParams();
     if (f.type) params.set('type', f.type);
+    if (f.texture) params.set('texture', f.texture);
     if (f.verified) params.set('verified', '1');
     if (f.badges.length) params.set('badges', f.badges.join(','));
     if (f.state) params.set('state', f.state);
@@ -128,6 +133,7 @@
   function matches(listing, f) {
     if (listing.stock <= 0) return false; // sold out listings stay off the marketplace
     if (f.type && listing.honeyType !== f.type) return false;
+    if (f.texture && listing.texture !== f.texture) return false;
     if (f.verified && !listing.badges.includes('volunteer-verified')) return false;
     if (f.badges.some(key => !listing.badges.includes(key))) return false; // must have every checked badge
     if (f.state && listing.state !== f.state) return false;
@@ -145,7 +151,7 @@
 
   // How many filters are on (sort doesn't count), for the mobile Filters button
   function activeFilterCount(f) {
-    return [f.type, f.verified, f.state, f.min !== null, f.max !== null, f.season].filter(Boolean).length + f.badges.length;
+    return [f.type, f.texture, f.verified, f.state, f.min !== null, f.max !== null, f.season].filter(Boolean).length + f.badges.length;
   }
 
   // ---------- Render ----------
@@ -154,6 +160,7 @@
     const f = readFilters();
     const results = listings.filter(l => matches(l, f)).sort(SORTS[f.sort] || SORTS.nearest);
 
+    disposeTooltips(grid);
     grid.innerHTML = results
       .map(listing => `<div class="col-sm-6 col-xl-4">${productCard(listing)}</div>`)
       .join('');
@@ -170,6 +177,7 @@
     el.nearNote.hidden = f.sort !== 'nearest';
     el.nearPlace.textContent = origin.label;
 
+    initTooltips(grid);
     writeUrl(f);
   }
 

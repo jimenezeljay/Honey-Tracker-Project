@@ -70,6 +70,17 @@
                 </select>
               </div>
 
+              <!-- A honey is only ever one of these, so it's a single choice -->
+              <div class="filter-group">
+                <label class="form-label" for="textureSelect">Texture</label>
+                <select class="form-select" id="textureSelect" name="texture">
+                  <option value="">Any texture</option>
+                  <option value="liquid">Liquid</option>
+                  <option value="crystallized">Crystallized</option>
+                  <option value="creamed">Creamed</option>
+                </select>
+              </div>
+
               <div class="filter-group">
                 <div class="form-check form-switch">
                   <input class="form-check-input" type="checkbox" role="switch" id="verifiedOnly" name="verified" value="1">

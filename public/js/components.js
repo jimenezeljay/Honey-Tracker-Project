@@ -55,11 +55,27 @@ function badge(key) {
 }
 
 // badgeIcon('raw') -> just the icon in the badge's colors, for tight spaces like product cards.
-// The name is still there for screen readers, and shows as a tooltip on hover.
+// The name is still there for screen readers, and shows in a tooltip on hover (see initTooltips).
 function badgeIcon(key) {
   const b = BADGES[key];
   if (!b) return '';
-  return `<span class="badge badge-${key} badge--icon" title="${b.label}">${icon(b.icon, 'badge-icon')}<span class="visually-hidden">${b.label}</span></span>`;
+  return `<span class="badge badge-${key} badge--icon" data-bs-toggle="tooltip" data-bs-title="${b.label}">${icon(b.icon, 'badge-icon')}<span class="visually-hidden">${b.label}</span></span>`;
+}
+
+// Turn on Bootstrap tooltips (e.g. icon badge names) inside an element.
+// Call after adding content; call disposeTooltips first if you replace that content.
+function initTooltips(root = document) {
+  if (typeof bootstrap === 'undefined') return;
+  root.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    bootstrap.Tooltip.getOrCreateInstance(el, { trigger: 'hover', placement: 'top' });
+  });
+}
+
+function disposeTooltips(root = document) {
+  if (typeof bootstrap === 'undefined') return;
+  root.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    bootstrap.Tooltip.getInstance(el)?.dispose();
+  });
 }
 
 // productCard({ id, title, farmName, price, photo, badges: ['certified', 'raw'] })

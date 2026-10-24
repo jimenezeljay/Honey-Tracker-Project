@@ -12,7 +12,8 @@
 //   why      what it supports on our site (for the team; not shown on the page)
 //   checked  when someone last opened the link and confirmed it says what we claim
 //
-// Sources chosen and checked Oct 23, 2026 (reviewed by Seamus).
+// Sources chosen and checked Oct 23, 2026 (reviewed by Seamus). Testing source swapped Oct 24, 2026
+// after the Bee Culture article went offline.
 
 const LEARN_SOURCES = [
   {
@@ -36,14 +37,14 @@ const LEARN_SOURCES = [
     checked: '2026-10-23'
   },
   {
-    id: 'beeculture-testing',
+    id: 'fda-testing-2026',
     kind: 'Testing',
-    title: 'Is it the honey it says it is? Two ways to tell',
-    publisher: 'Bee Culture',
-    date: '',
-    url: 'https://www.beeculture.com/catch-the-buzz-is-it-the-honey-it-says-it-is-two-ways-to-tell/',
-    why: 'How honey is tested: pollen analysis (Vaughn Bryant, Texas A&M) and NMR (Istvan Pelczer, Princeton). The article gives no publish date.',
-    checked: '2026-10-23'
+    title: 'FDA Releases FY25 Sampling Results on Economically Motivated Adulteration in Honey',
+    publisher: 'U.S. Food and Drug Administration',
+    date: 'April 13, 2026',
+    url: 'https://www.fda.gov/food/hfp-constituent-updates/fda-releases-fy25-sampling-results-economically-motivated-adulteration-honey',
+    why: 'How honey is tested: FDA checked 102 samples (54 U.S., 48 imported) for cheap added syrups using stable carbon isotope ratio analysis; about 4% of each group failed. Replaced the Bee Culture "Two ways to tell" article, which went offline (404) by Oct 24, 2026.',
+    checked: '2026-10-24'
   },
   {
     id: 'fda-labeling-2018',

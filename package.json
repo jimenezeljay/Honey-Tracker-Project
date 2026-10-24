@@ -4,8 +4,8 @@
   "description": "Official Honey Tracker Repository for all things U.I. :D",
   "main": "script.js",
 "scripts": {
-  "build:css": "sass --load-path=node_modules --quiet-deps --silence-deprecation=import --style=compressed scss/main.scss css/main.css",
-  "watch:css": "sass --watch --load-path=node_modules --quiet-deps --silence-deprecation=import scss/main.scss css/main.css"
+  "build:css": "sass --load-path=node_modules --quiet-deps --silence-deprecation=import --style=compressed public/scss/main.scss public/css/main.css",
+  "watch:css": "sass --watch --load-path=node_modules --quiet-deps --silence-deprecation=import public/scss/main.scss public/css/main.css"
 },
   "repository": {
     "type": "git",
