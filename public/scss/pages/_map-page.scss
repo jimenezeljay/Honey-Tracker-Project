@@ -6,19 +6,26 @@
 
 .map-page {
   display: grid;
-  grid-template-areas: "controls" "stage" "results";
+  grid-template-areas: "title" "controls" "stage" "results";
   gap: 1rem;
-  padding: 1rem;
+  padding: 2.5rem 1rem 1rem;
 
   @include media-breakpoint-up(lg) {
     grid-template-columns: 22rem minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr);
-    grid-template-areas: "controls stage" "results stage";
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas: "title title" "controls stage" "results stage";
     gap: 0 1.25rem;
     height: calc(100vh - 4.5rem); // fills the screen under the navbar
-    min-height: 34rem;
-    padding: 1.25rem;
+    min-height: 40rem;
+    padding: 2.5rem 1.25rem 1.25rem; // same top space as Marketplace
   }
+}
+
+.map-page > .page-head {
+  grid-area: title;
+  margin-bottom: 1rem;
+
+  @include media-breakpoint-up(lg) { margin-bottom: 1.25rem; }
 }
 
 .map-label {
