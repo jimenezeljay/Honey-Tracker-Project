@@ -96,36 +96,3 @@
   outline: 3px solid $ink;
   outline-offset: 2px;
 }
-
-// TEMPORARY: "Softened" style, the same tiles tinted toward cream and sage.
-// Remove with the switch in js/maps.js once a style is picked.
-.ht-map--soft .leaflet-tile-pane {
-  filter: grayscale(.55) sepia(.35) saturate(.9) brightness(1.04) contrast(.92);
-}
-
-// TEMPORARY: Standard / Softened switch, bottom left
-.map-style-switch {
-  position: fixed;
-  left: 1rem;
-  bottom: 1rem;
-  z-index: $zindex-fixed;
-  display: flex;
-  gap: .25rem;
-  padding: .25rem;
-  background: #fff;
-  border: 1px solid $line;
-  border-radius: 999px;
-  box-shadow: 0 2px 10px rgba($ink, .12);
-
-  .btn {
-    border-radius: 999px;
-    font-weight: 600;
-    color: $ink-soft;
-    padding-inline: .9rem;
-
-    &.active { background: $amber; color: $ink; }
-  }
-
-  // Phones: sit above the product page's sticky buy bar
-  @include media-breakpoint-down(lg) { bottom: 5.5rem; }
-}

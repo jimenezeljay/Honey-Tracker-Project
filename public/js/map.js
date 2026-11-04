@@ -206,5 +206,4 @@
   draw({ fit: !start }); // a farm link zooms straight to that farm instead
   if (start) openFarm(start);
 
-  HTMap.addStyleSwitch(); // TEMPORARY
 })();

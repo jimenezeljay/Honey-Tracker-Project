@@ -36,7 +36,6 @@ const HTMap = (function () {
     });
     L.tileLayer(TILE_URL, { maxZoom: 18, attribution: ATTRIBUTION }).addTo(map);
     el.classList.add('ht-map');
-    applyStyle(el);
     maps.push(map);
     return map;
   }
@@ -101,54 +100,11 @@ const HTMap = (function () {
     return { markers, circles, areas: [], exact: true };
   }
 
-  // ---- TEMPORARY: Standard / Softened switch (bottom left) ----
-  // Softened tints the same OpenStreetMap tiles toward the site's cream and sage.
-  // Remembered in this browser; ?mapstyle=softened also works.
-  // Delete this block, .map-style-switch and .ht-map--soft once one is picked.
-  const STYLE_KEY = 'ht-map-style';
-  let style = 'standard';
-  try {
-    style = new URLSearchParams(window.location.search).get('mapstyle')
-      || localStorage.getItem(STYLE_KEY) || 'standard';
-  } catch (error) { /* storage blocked */ }
-
-  function applyStyle(el) {
-    el.classList.toggle('ht-map--soft', style === 'softened');
-  }
-
-  function setStyle(next) {
-    style = next;
-    document.querySelectorAll('.ht-map').forEach(applyStyle);
-    document.querySelectorAll('.map-style-switch [data-map-style]').forEach(button => {
-      const on = button.dataset.mapStyle === style;
-      button.classList.toggle('active', on);
-      button.setAttribute('aria-pressed', String(on));
-    });
-    try { localStorage.setItem(STYLE_KEY, style); } catch (error) { /* storage blocked */ }
-  }
-
-  function addStyleSwitch() {
-    if (document.querySelector('.map-style-switch')) return;
-    const box = document.createElement('div');
-    box.className = 'map-style-switch';
-    box.setAttribute('role', 'group');
-    box.setAttribute('aria-label', 'Map style');
-    box.innerHTML = `
-      <button type="button" class="btn btn-sm" data-map-style="standard">Standard</button>
-      <button type="button" class="btn btn-sm" data-map-style="softened">Softened</button>`;
-    document.body.appendChild(box);
-    box.addEventListener('click', event => {
-      const button = event.target.closest('[data-map-style]');
-      if (button) setStyle(button.dataset.mapStyle);
-    });
-    setStyle(style);
-  }
-
   // Leaflet measures its box once; call this after a map's container changes size
   // (e.g. a collapsed section opening).
   function refresh(map) {
     if (map) setTimeout(() => map.invalidateSize(), 0);
   }
 
-  return { create, pin, forage, area, areaIcon, farmMarkers, addStyleSwitch, refresh, AMBER, SAGE };
+  return { create, pin, forage, area, areaIcon, farmMarkers, refresh, AMBER, SAGE };
 })();

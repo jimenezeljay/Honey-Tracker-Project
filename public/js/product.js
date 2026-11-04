@@ -290,7 +290,6 @@
     const where = document.getElementById('secWhere');
     where?.addEventListener('shown.bs.collapse', () => drawHiveMap(t));
     if (where?.classList.contains('show')) drawHiveMap(t);
-    if (typeof HTMap !== 'undefined') HTMap.addStyleSwitch(); // TEMPORARY
 
     initTooltips(page);
     if (typeof bootstrap !== 'undefined') {

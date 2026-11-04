@@ -21,5 +21,4 @@
   const group = L.featureGroup(layers).addTo(map);
   map.fitBounds(group.getBounds(), { padding: [40, 40] });
 
-  HTMap.addStyleSwitch(); // TEMPORARY
 })();
