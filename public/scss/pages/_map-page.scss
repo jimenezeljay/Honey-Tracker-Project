@@ -13,7 +13,7 @@
   @include media-breakpoint-up(lg) {
     grid-template-columns: 22rem minmax(0, 1fr);
     grid-template-rows: auto auto minmax(0, 1fr);
-    grid-template-areas: "title title" "controls stage" "results stage";
+    grid-template-areas: "title stage" "controls stage" "results stage"; // map starts level with the title
     gap: 0 1.25rem;
     height: calc(100vh - 4.5rem); // fills the screen under the navbar
     min-height: 40rem;
