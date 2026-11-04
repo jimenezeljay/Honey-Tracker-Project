@@ -27,9 +27,6 @@
        product.html?batch=11 a QR label; the batch may not be sold here (then "Visit keeper's shop")
        Everything inside [data-fill] is filled in by js/product.js. -->
   <main class="container trace" id="trace" aria-busy="true">
-    <!-- Above both columns, so the photo's top lines up with the title -->
-    <nav aria-label="breadcrumb" data-fill="breadcrumb"></nav>
-
     <div class="row g-4 g-lg-5">
 
       <!-- Photo + buy box. First on phones, right column on desktop -->
@@ -40,7 +37,9 @@
         </div>
       </div>
 
-      <div class="col-12 col-lg-7 order-lg-1">
+      <div class="col-12 col-lg-7 order-lg-1" id="traceMain">
+        <nav aria-label="breadcrumb" data-fill="breadcrumb"></nav>
+
         <header class="trace-head">
           <h1 class="trace-title" data-fill="title">Loading…</h1>
           <p class="trace-from mb-0" data-fill="from"></p>

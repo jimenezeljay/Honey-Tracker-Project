@@ -232,6 +232,28 @@
     window.location.href = 'cart.html';
   }
 
+  // ---- Desktop: photo sized so the buy box ends level with the last section ----
+  // Measured with the sections closed, so opening one doesn't stretch the photo.
+  // Phones (one column) keep the normal 4:3 photo.
+  const desktop = window.matchMedia('(min-width: 992px)');
+
+  function fitPhoto() {
+    const main = document.getElementById('traceMain');
+    const aside = document.querySelector('.trace-aside');
+    const photo = fill('photo');
+    const buy = fill('buy');
+    if (!main || !aside || !photo || !buy) return;
+
+    if (!desktop.matches) { photo.style.height = ''; return; }
+
+    // Left column height without any open section bodies
+    const openBodies = [...main.querySelectorAll('.collapse')].reduce((sum, el) => sum + el.offsetHeight, 0);
+    const leftHeight = main.offsetHeight - openBodies;
+    const gap = parseFloat(getComputedStyle(aside).rowGap) || 0;
+    const height = Math.max(120, leftHeight - buy.offsetHeight - gap);
+    photo.style.height = `${height}px`;
+  }
+
   // ---- Load ----
 
   async function load() {
@@ -253,6 +275,10 @@
       page.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => bootstrap.Popover.getOrCreateInstance(el));
     }
     page.setAttribute('aria-busy', 'false');
+
+    fitPhoto();
+    window.addEventListener('resize', fitPhoto);
+    document.fonts?.ready.then(fitPhoto); // headings shift a little once Lora loads
   }
 
   load();
