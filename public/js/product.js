@@ -83,11 +83,8 @@
     const radius = t.hives[0]?.forageRadiusMi;
     const exact = farm.precision === 'exact';
 
-    // Placeholder map until the Map page (Jira HC-106) adds OpenStreetMap.
+    // Real map (js/maps.js), drawn the first time the section opens.
     // Approximate farms only ever show an area, never a pin (keepers' privacy).
-    const marker = exact
-      ? `<span class="trace-map__radius" aria-hidden="true"></span><span class="map-pin" style="left:50%;top:50%"></span>`
-      : `<span class="map-area" style="left:50%;top:50%"></span>`;
     const legend = exact
       ? `<span><span class="key-pin"></span>Hive</span><span><span class="key-radius"></span>${radius} mi forage</span>`
       : `<span><span class="key-area"></span>Approximate area</span>`;
@@ -103,9 +100,10 @@
       .map(f => `<li class="trace-chip">${escapeHtml(f)}</li>`).join('');
 
     fill('where').innerHTML = `
-      <div class="map-box trace-map" role="img" aria-label="${exact ? 'Hive location' : 'Approximate hive area'} near ${escapeHtml(farm.county)} County, ${escapeHtml(farm.state)}">
-        ${marker}
+      <div class="map-box trace-map">
+        <div class="trace-map__canvas" id="hiveMap" aria-label="Map: ${exact ? 'hive locations' : 'approximate hive area'} near ${escapeHtml(farm.county)} County, ${escapeHtml(farm.state)}"></div>
         <div class="map-legend">${legend}</div>
+        <a class="trace-map__link" href="map.html?farm=${encodeURIComponent(farm.id)}">Open in map</a>
       </div>
       <div class="trace-where__info">
         <h3 class="trace-label">Pollen</h3>
@@ -114,6 +112,21 @@
         <ul class="trace-chips">${flowers}</ul>
         <p class="trace-note">Not medical advice.</p>
       </div>`;
+  }
+
+  // Leaflet needs a visible box to measure, so the map waits for its section to open
+  let hiveMap = null;
+
+  function drawHiveMap(t) {
+    const el = document.getElementById('hiveMap');
+    if (!el || typeof HTMap === 'undefined') return;
+    if (hiveMap) { HTMap.refresh(hiveMap); return; }
+
+    hiveMap = HTMap.create(el, { center: [t.farm.lat, t.farm.lng], zoom: 11 });
+    if (!hiveMap) return;
+    const { markers, circles, areas, exact } = HTMap.farmMarkers(t.farm, { hives: t.hives });
+    const group = L.featureGroup(exact ? [...circles, ...markers] : areas).addTo(hiveMap);
+    hiveMap.fitBounds(group.getBounds(), { padding: [24, 24], maxZoom: 12 });
   }
 
   // ---- The keeper ----
@@ -273,6 +286,11 @@
     renderKeeper(t);
     renderMade(t);
     renderBuy(t);
+
+    const where = document.getElementById('secWhere');
+    where?.addEventListener('shown.bs.collapse', () => drawHiveMap(t));
+    if (where?.classList.contains('show')) drawHiveMap(t);
+    if (typeof HTMap !== 'undefined') HTMap.addStyleSwitch(); // TEMPORARY
 
     initTooltips(page);
     if (typeof bootstrap !== 'undefined') {

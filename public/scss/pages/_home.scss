@@ -26,3 +26,18 @@
     grid-template-columns: 5fr 7fr;
   }
 }
+
+// Real homepage map: Leaflet fills the box, the search and legend sit above it
+.home-map__box { padding: 0; }
+
+.home-map__canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.home-map__box .map-search,
+.home-map__box .map-legend { z-index: 1001; }
+
+.home-map__box .map-search { left: auto; right: 1rem; } // clear of the zoom buttons
+.home-map__box .map-legend { bottom: 1.6rem; }          // clear of the attribution

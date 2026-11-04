@@ -244,6 +244,19 @@ async function getTrace(batchId) {
   };
 }
 
+// Every farm for the maps: keeper, hives, and the honey it sells here.
+// The backend's GET /farms should return roughly this shape. Approximate farms
+// must arrive with rounded coordinates (lat/lng) and no hive coordinates.
+async function getFarms() {
+  const listings = MOCK.listings.map(listingView);
+  return MOCK.farms.map(farm => ({
+    ...farm,
+    keeper: byId(MOCK.keepers, farm.keeperId),
+    hives: MOCK.hives.filter(h => h.farmId === farm.id),
+    listings: listings.filter(l => l.farmId === farm.id)
+  }));
+}
+
 // One farm with its hives (map popup, product hover card).
 async function getFarm(id) {
   const farm = byId(MOCK.farms, id);

@@ -160,17 +160,30 @@
 .trace-map {
   min-height: 16rem;
 
-  // Forage radius around an exact hive pin (approximate farms show .map-area instead)
-  .trace-map__radius {
+  padding: 0;
+
+  // Leaflet fills this box (js/maps.js)
+  .trace-map__canvas {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 7rem;
-    height: 7rem;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    background: rgba($sage, .18);
-    border: 2px solid rgba($sage, .7);
+    inset: 0;
+    z-index: 0;
+  }
+
+  // Legend and "Open in map" sit above Leaflet's layers (they go up to 1000)
+  .map-legend { z-index: 1001; bottom: 1.6rem; }
+
+  .trace-map__link {
+    position: absolute;
+    top: .75rem;
+    right: .75rem;
+    z-index: 1001;
+    padding: .3rem .7rem;
+    font-size: .85rem;
+    font-weight: 600;
+    background: #fff;
+    border: 1px solid $line;
+    border-radius: 999px;
+    text-decoration: none;
   }
 
   .map-legend .key-radius {
