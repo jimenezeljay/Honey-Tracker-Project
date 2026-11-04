@@ -177,3 +177,44 @@ async function getFarm(id) {
     hives: MOCK.hives.filter(h => h.farmId === farm.id)
   };
 }
+
+// ---- Signed-in beekeeper ----
+
+// The sample keeper these pages show until sign-in is connected.
+const MOCK_SIGNED_IN_KEEPER_ID = 1;
+
+// Try other cases while there's no backend (only this mock reads it):
+//   dashboard.html?state=new         approved keeper with no farms yet
+//   dashboard.html?state=suspended   certification suspended
+//   dashboard.html?state=pending     application not approved yet
+//   dashboard.html?state=signed-out  not signed in
+//   keeper-pending.html?state=submitted | under-review | approved
+const mockState = () => new URLSearchParams(location.search).get('state');
+
+// Only the signed-in keeper's own records, or null if nobody is signed in.
+// The backend's GET /keeper/dashboard must work out the keeper from the session,
+// never from the URL, and refuse anyone who isn't an approved keeper.
+async function getKeeperDashboard() {
+  const state = mockState();
+  if (state === 'signed-out') return null;
+
+  const keeper = { ...byId(MOCK.keepers, MOCK_SIGNED_IN_KEEPER_ID) };
+  if (state === 'pending') {
+    keeper.applicationStatus = 'under-review';
+    keeper.certification = 'pending';
+  }
+  if (state === 'suspended') keeper.certification = 'suspended';
+  if (state === 'new') return { keeper, farms: [], hives: [], batches: [], listings: [] };
+
+  const farms = MOCK.farms.filter(farm => farm.keeperId === keeper.id);
+  const hives = MOCK.hives.filter(hive => farms.some(farm => farm.id === hive.farmId));
+  const batches = MOCK.batches.filter(batch => batch.hiveIds.some(id => hives.some(hive => hive.id === id)));
+  const listings = MOCK.listings.filter(listing => batches.some(batch => batch.id === listing.batchId));
+  return { keeper, farms, hives, batches, listings };
+}
+
+// Where the signed-in keeper's application stands: submitted, under-review or approved.
+// The backend's GET /applications/keeper returns this.
+async function getKeeperApplication() {
+  return { status: mockState() || 'under-review' };
+}

@@ -26,6 +26,9 @@ const ICONS = {
   'jar':         '<path d="M7 3.5h10"/><path d="M8 3.5v2.2C6 6.8 5 8.6 5 11v6.5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3V11c0-2.4-1-4.2-3-5.3V3.5"/><path d="M5.2 12.5c1.4-1.3 2.9-1.3 4.3 0s2.9 1.3 4.3 0 2.9-1.3 4.3 0"/>',
   'hive-box':    '<path d="M2.5 5.5h19v3h-19Z"/><path d="M4 8.5h16v8H4Z"/><path d="M10 12h4"/><path d="M2.5 16.5h19"/><path d="M5.5 16.5v3M18.5 16.5v3"/>',
   'magnifier-check': '<circle cx="10" cy="10" r="7"/><path d="m15.1 15.1 5.4 5.4"/><path d="m7.2 10.2 2 2 3.8-4"/>',
+  // Beekeeper pages: the hat that opens the menu, and the farm count
+  'keeper-hat':  '<path d="M2 11.5c3 1.5 6.3 2.2 10 2.2s7-.7 10-2.2"/><path d="M8 12.6V6a1.5 1.5 0 0 1 1.5-1.5h5A1.5 1.5 0 0 1 16 6v6.6"/><path d="M5.5 13v7h13v-7"/><path d="M9.5 16.5h5"/>',
+  'barn':        '<path d="M4 20.5V10l8-6.5 8 6.5v10.5Z"/><path d="M9 20.5v-6h6v6"/><path d="m9 14.5 6 6M15 14.5l-6 6"/>',
   // Learn page only (not badges): Crystallized and Liquid
   'crystals':    '<path d="M3 21h18"/><path d="M9.8 21V7.8L12 4.2l2.2 3.6V21"/><path d="M9.8 7.8 12 9.2l2.2-1.4M12 9.2V21"/><path d="M5.4 21 2.9 11.9 4 9.5l2.1 1.6L8.6 21"/><path d="M2.9 11.9l3.2-.8"/><path d="M18.6 21l2.5-9.1L20 9.5l-2.1 1.6L15.4 21"/><path d="M21.1 11.9l-3.2-.8"/>',
   'waves':       '<path d="M3 7.5c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0"/><path d="M3 12.5c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0"/><path d="M3 17.5c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0"/>'
@@ -99,15 +102,39 @@ function productCard(listing) {
     </article>`;
 }
 
-// siteNav('map') -> the top bar, with "Map" marked as the current page
-function siteNav(active) {
+// siteNav('map')         -> the top bar, with "Map" marked as the current page
+// siteNav(null, 'keeper') -> the signed-in beekeeper version: hat icon + Account menu.
+// Until sign-in is connected, a page picks this with data-role="keeper" on its placeholder.
+function siteNav(active, role) {
   const link = (page, label) =>
     `<li class="nav-item"><a class="nav-link${active === page ? ' active' : ''}" href="${page}.html"${active === page ? ' aria-current="page"' : ''}>${label}</a></li>`;
+
+  // The hat stays outside the collapsing menu so it's always visible on phones.
+  // It opens the beekeeper menu where there is one; elsewhere it links to the dashboard.
+  const keeperHat = role === 'keeper'
+    ? `<a class="btn btn-outline-secondary btn-icon keeper-hat order-lg-last ms-auto ms-lg-2 me-2 me-lg-0" href="dashboard.html" data-keeper-menu-toggle aria-label="Beekeeper menu" title="Beekeeper menu">${icon('keeper-hat')}</a>`
+    : '';
+
+  const actions = role === 'keeper'
+    ? `<div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Account</button>
+            <ul class="dropdown-menu dropdown-menu-lg-end">
+              <li><a class="dropdown-item" href="dashboard.html">Dashboard</a></li>
+              <li><a class="dropdown-item" href="#">Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="signin.html">Sign out</a></li>
+            </ul>
+          </div>`
+    : `<div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" href="signin.html">Sign in</a>
+            <a class="btn btn-primary" href="get-started.html">Get started</a>
+          </div>`;
 
   return `
     <nav class="navbar navbar-expand-lg site-nav">
       <div class="container">
         <a class="navbar-brand" href="index.html"><span class="brand-mark"><img src="images/honey-tracker-logo.png" alt="" class="brand-logo"></span> Honey Tracker</a>
+        ${keeperHat}
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Open menu">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -117,10 +144,7 @@ function siteNav(active) {
             ${link('marketplace', 'Marketplace')}
             ${link('learn', 'Learn')}
           </ul>
-          <div class="d-flex gap-2">
-            <a class="btn btn-outline-secondary" href="signin.html">Sign in</a>
-            <a class="btn btn-primary" href="get-started.html">Get started</a>
-          </div>
+          ${actions}
         </div>
       </div>
     </nav>`;
@@ -142,6 +166,64 @@ function siteFooter() {
     </footer>`;
 }
 
+// keeperSidebar('dashboard') -> the beekeeper menu (wireframes 13, 15, 16).
+// A column on large screens, a slide-in drawer on phones. The hat in the top bar toggles it.
+// My Farms & Hives and My Listings have no pages of their own yet, so they jump to
+// their dashboard sections. Profile is a placeholder until it has a page.
+function keeperSidebar(active) {
+  const items = [
+    { key: 'dashboard', label: 'Dashboard',        icon: 'bi-speedometer2', href: 'dashboard.html' },
+    { key: 'farms',     label: 'My Farms & Hives', icon: 'bi-geo-alt',      href: 'dashboard.html#farms' },
+    { key: 'harvest',   label: 'Log Harvest',      icon: 'bi-journal-plus', href: 'log-harvest.html' },
+    { key: 'listings',  label: 'My Listings',      icon: 'bi-shop',         href: 'dashboard.html#listings' },
+    { key: 'profile',   label: 'Profile',          icon: 'bi-person',       href: '#' }
+  ];
+  const links = items.map(item => `
+          <li class="nav-item">
+            <a class="nav-link${active === item.key ? ' active' : ''}" href="${item.href}"${active === item.key ? ' aria-current="page"' : ''}>
+              <i class="bi ${item.icon}" aria-hidden="true"></i> ${escapeHtml(item.label)}
+            </a>
+          </li>`).join('');
+
+  return `
+    <aside class="offcanvas-lg offcanvas-start keeper-sidebar" tabindex="-1" id="keeperMenu" aria-labelledby="keeperMenuLabel">
+      <div class="offcanvas-header">
+        <h2 class="offcanvas-title h5" id="keeperMenuLabel">Beekeeper menu</h2>
+        <button class="btn-close" type="button" data-bs-dismiss="offcanvas" data-bs-target="#keeperMenu" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="nav flex-column">${links}
+        </ul>
+      </div>
+    </aside>`;
+}
+
+// statTile('Hives', 3, 'hive-box') -> a number with a label (dashboard counts).
+// The icon is a name from ICONS above.
+function statTile(label, value, iconName) {
+  return `
+    <div class="stat-tile">
+      <span class="stat-tile__icon">${icon(iconName, 'stat-tile__svg')}</span>
+      <span class="stat-tile__value">${escapeHtml(value)}</span>
+      <span class="stat-tile__label">${escapeHtml(label)}</span>
+    </div>`;
+}
+
+// The hat icon: hides or shows the menu column on large screens, opens the drawer on phones.
+// On a page with no menu it stays a normal link to the dashboard.
+document.addEventListener('click', event => {
+  const hat = event.target.closest('[data-keeper-menu-toggle]');
+  const layout = document.querySelector('.keeper-layout');
+  if (!hat || !layout) return;
+
+  event.preventDefault();
+  if (window.matchMedia('(min-width: 992px)').matches) {
+    layout.classList.toggle('menu-hidden');
+  } else {
+    bootstrap.Offcanvas.getOrCreateInstance('#keeperMenu').toggle();
+  }
+});
+
 // Quantity selector: makes the − / + buttons inside any .qty-stepper work.
 // Listens on the whole document, so it also works for cart lines added later by JS.
 // Respects the input's min / max, and fires "change" so cart.js can react:
@@ -160,10 +242,15 @@ document.addEventListener('click', event => {
 
 // Fill placeholders on the page:
 //   <div data-component="site-nav" data-active="map"></div>
+//   <div data-component="site-nav" data-role="keeper"></div>
+//   <div data-component="keeper-sidebar" data-active="dashboard"></div>
 //   <div data-component="site-footer"></div>
 //   <span data-badge="certified"></span>
 document.querySelectorAll('[data-component="site-nav"]').forEach(el => {
-  el.outerHTML = siteNav(el.dataset.active);
+  el.outerHTML = siteNav(el.dataset.active, el.dataset.role);
+});
+document.querySelectorAll('[data-component="keeper-sidebar"]').forEach(el => {
+  el.innerHTML = keeperSidebar(el.dataset.active);
 });
 document.querySelectorAll('[data-component="site-footer"]').forEach(el => {
   el.outerHTML = siteFooter();

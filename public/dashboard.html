@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard · Honey Tracker</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Compiled CSS (already includes Bootstrap) -->
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <!-- Navbar and footer are built by js/components.js (edit them there, once) -->
+  <div data-component="site-nav" data-role="keeper"></div>
+
+  <!-- Beekeeper dashboard (wireframe 13). Stays hidden until js/dashboard.js has confirmed
+       an approved keeper and filled it with that keeper's own records. -->
+  <div class="container keeper-layout" id="keeperPage" hidden>
+    <div data-component="keeper-sidebar" data-active="dashboard"></div>
+
+    <main class="keeper-main">
+      <header class="dashboard-header">
+        <h1 id="welcome">Welcome back</h1>
+        <div id="certification"></div>
+      </header>
+
+      <div class="alert alert-warning" id="suspendedNotice" role="alert" hidden>
+        Your certification is suspended. Your listings are hidden until it's resolved.
+      </div>
+
+      <!-- Shown instead of the dashboard when the keeper has no farms yet -->
+      <div class="empty-state panel" id="newKeeper" hidden>
+        <span class="empty-icon d-block mb-3" id="newKeeperIcon"></span>
+        <h2 class="mb-3">Your hive is quiet.</h2>
+        <p class="lead mb-4">Add a farm and pin your hives to get started.</p>
+        <a class="btn btn-primary btn-lg" href="add-farm.html">Add your first farm</a>
+      </div>
+
+      <div id="dashboardContent">
+        <div class="row g-3 mb-4" id="stats"></div>
+
+        <div class="row g-4 mb-4">
+          <section class="col-xl-7 dashboard-section" id="farms" aria-labelledby="farmsTitle">
+            <div class="dashboard-section__head">
+              <h2 id="farmsTitle">My apiaries</h2>
+              <a class="btn btn-sm btn-outline-secondary" href="add-farm.html"><i class="bi bi-plus-lg" aria-hidden="true"></i> Add farm</a>
+            </div>
+            <div id="apiaryMap"></div>
+          </section>
+
+          <section class="col-xl-5 dashboard-section" aria-labelledby="harvestsTitle">
+            <div class="dashboard-section__head">
+              <h2 id="harvestsTitle">Recent harvests</h2>
+              <a class="btn btn-sm btn-outline-secondary" href="log-harvest.html"><i class="bi bi-plus-lg" aria-hidden="true"></i> Log harvest</a>
+            </div>
+            <ul class="dash-list" id="recentHarvests"></ul>
+          </section>
+        </div>
+
+        <section class="dashboard-section" id="listings" aria-labelledby="listingsTitle">
+          <div class="dashboard-section__head">
+            <h2 id="listingsTitle">My listings</h2>
+          </div>
+          <ul class="dash-list" id="myListings"></ul>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div data-component="site-footer"></div>
+
+  <!-- Shared navbar + footer first (local file, so they appear without waiting on the CDN) -->
+  <script src="js/components.js"></script>
+  <!-- Bootstrap JS (dropdowns, tabs, offcanvas, modals). Goes at the end of body -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Your JS -->
+  <script src="js/main.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
