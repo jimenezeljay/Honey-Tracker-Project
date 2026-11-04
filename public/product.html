@@ -27,6 +27,9 @@
        product.html?batch=11 a QR label; the batch may not be sold here (then "Visit keeper's shop")
        Everything inside [data-fill] is filled in by js/product.js. -->
   <main class="container trace" id="trace" aria-busy="true">
+    <!-- Above both columns, so the photo's top lines up with the title -->
+    <nav aria-label="breadcrumb" data-fill="breadcrumb"></nav>
+
     <div class="row g-4 g-lg-5">
 
       <!-- Photo + buy box. First on phones, right column on desktop -->
@@ -38,8 +41,6 @@
       </div>
 
       <div class="col-12 col-lg-7 order-lg-1">
-        <nav aria-label="breadcrumb" data-fill="breadcrumb"></nav>
-
         <header class="trace-head">
           <h1 class="trace-title" data-fill="title">Loading…</h1>
           <p class="trace-from mb-0" data-fill="from"></p>
@@ -49,13 +50,13 @@
         <!-- Bloom → Harvest → Jarred. Always shown, never collapsed -->
         <ol class="trace-steps" data-fill="steps" aria-label="Chain of custody"></ol>
 
-        <!-- Three sections; "Where it's from" starts open -->
+        <!-- Three sections, all closed until clicked -->
         <div class="trace-sections">
           <section class="trace-section">
             <h2 class="trace-section__head">
-              <button class="trace-section__toggle" type="button" data-bs-toggle="collapse" data-bs-target="#secWhere" aria-expanded="true" aria-controls="secWhere">Where it's from</button>
+              <button class="trace-section__toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#secWhere" aria-expanded="false" aria-controls="secWhere">Where it's from</button>
             </h2>
-            <div class="collapse show" id="secWhere">
+            <div class="collapse" id="secWhere">
               <div class="trace-section__body trace-where" data-fill="where"></div>
             </div>
           </section>
