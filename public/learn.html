@@ -21,27 +21,29 @@
   <!-- Navbar and footer are built by js/components.js (edit them there, once) -->
   <div data-component="site-nav" data-active="learn"></div>
 
-  <!-- Wireframe 9: side tabs on the left, content on the right.
-       Below lg the side tabs become a scrollable row of pills above the content.
+  <!-- Wireframe 9 (v2): title on the left, the three tabs on the right as one white block
+       with an amber highlight that slides to the open tab (js/learn.js). Content runs full width below.
+       Phones: the tabs sit under the title with shorter labels so they fit.
        Pollen & allergies is left out until the allergy research (Jira HC-19) is done. -->
   <main class="container learn">
-    <header class="page-head">
-      <h1 class="mb-1">Learn</h1>
-      <p class="text-soft mb-0">What&rsquo;s in your honey, and why it matters.</p>
-    </header>
+    <div class="learn-top">
+      <header class="page-head">
+        <h1 class="mb-1">Learn</h1>
+        <p class="text-soft mb-0">What&rsquo;s in your honey, and why it matters.</p>
+      </header>
+
+      <nav class="learn-tabs" aria-label="Learn sections">
+        <div class="nav" role="tablist">
+          <span class="learn-tabs__thumb" aria-hidden="true"></span>
+          <button class="nav-link active" id="btn-definitions" data-bs-toggle="pill" data-bs-target="#tab-definitions" type="button" role="tab" aria-controls="tab-definitions" aria-selected="true"><span class="d-none d-sm-inline">Honey definitions</span><span class="d-sm-none">Definitions</span></button>
+          <button class="nav-link" id="btn-purity" data-bs-toggle="pill" data-bs-target="#tab-purity" type="button" role="tab" aria-controls="tab-purity" aria-selected="false"><span class="d-none d-sm-inline">Why purity matters</span><span class="d-sm-none">Purity</span></button>
+          <button class="nav-link" id="btn-deeper" data-bs-toggle="pill" data-bs-target="#tab-deeper" type="button" role="tab" aria-controls="tab-deeper" aria-selected="false">Go deeper</button>
+        </div>
+      </nav>
+    </div>
 
     <div class="row g-4">
-      <div class="col-lg-3">
-        <nav class="learn-tabs" aria-label="Learn sections">
-          <div class="nav flex-lg-column" role="tablist">
-            <button class="nav-link active" id="btn-definitions" data-bs-toggle="pill" data-bs-target="#tab-definitions" type="button" role="tab" aria-controls="tab-definitions" aria-selected="true">Honey definitions</button>
-            <button class="nav-link" id="btn-purity" data-bs-toggle="pill" data-bs-target="#tab-purity" type="button" role="tab" aria-controls="tab-purity" aria-selected="false">Why purity matters</button>
-            <button class="nav-link" id="btn-deeper" data-bs-toggle="pill" data-bs-target="#tab-deeper" type="button" role="tab" aria-controls="tab-deeper" aria-selected="false">Go deeper</button>
-          </div>
-        </nav>
-      </div>
-
-      <div class="col-lg-9 tab-content">
+      <div class="col-12 tab-content">
         <!-- Honey definitions: tiles built from LEARN_TERMS in js/learn.js -->
         <section class="tab-pane fade show active" id="tab-definitions" role="tabpanel" aria-labelledby="btn-definitions" tabindex="0">
           <h2 class="learn-title">What does the label mean?</h2>

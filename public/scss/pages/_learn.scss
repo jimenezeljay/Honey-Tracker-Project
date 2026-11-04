@@ -9,55 +9,68 @@ $liquid-gold:  #C98A12;  // Liquid icon
 }
 
 .learn-title {
-  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-size: 1.75rem; // smaller than the page's "Learn" title, so that one leads
   margin-bottom: .25rem;
 }
 
-// ---- Side tabs: a white panel on desktop, a scrollable row of pills on smaller screens ----
+// ---- Title on the left, tabs on the right (tabs drop under the title on smaller screens) ----
+.learn-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  margin-bottom: 2rem;
+
+  .page-head { margin-bottom: 0; }
+}
+
+// ---- Tabs: one white block; the amber thumb slides to the open tab (js/learn.js) ----
 .learn-tabs {
+  max-width: 100%;
+
   .nav {
-    gap: .4rem;
+    position: relative;
     flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: .25rem; // room for the scrollbar on touch devices
+    padding: .3rem;
+    background: #fff;
+    border: 1px solid $line;
+    border-radius: 999px;
   }
 
   .nav-link {
+    position: relative;
+    z-index: 1;
     color: $ink-soft;
     font-weight: 600;
     white-space: nowrap;
     border-radius: 999px;
-    background: #fff;
-    border: 1px solid $line;
-    padding: .55rem 1rem;
+    padding: .55rem 1.1rem;
+    transition: color .25s ease;
 
     &:hover { color: $ink; }
+    &.active { color: $ink; background: transparent; }
 
-    &.active {
-      background: $amber;
-      border-color: $amber;
-      color: $ink;
-    }
-  }
-
-  @include media-breakpoint-up(lg) {
-    position: sticky;
-    top: 1.5rem;
-    background: #fff;
-    border: 1px solid $line;
-    border-radius: 1rem;
-    padding: .75rem;
-
-    .nav { overflow: visible; padding-bottom: 0; }
-
-    .nav-link {
-      text-align: left;
-      border: 0;
-      border-radius: .6rem;
-      padding: .7rem .95rem;
-    }
+    @include media-breakpoint-down(sm) { padding-inline: .85rem; }
   }
 }
+
+.learn-tabs__thumb {
+  position: absolute;
+  z-index: 0;
+  top: .3rem;
+  bottom: .3rem;
+  left: 0;
+  width: 0;
+  border-radius: 999px;
+  background: $amber;
+  transition: left .3s cubic-bezier(.3, .7, .2, 1), width .3s cubic-bezier(.3, .7, .2, 1);
+
+  @media (prefers-reduced-motion: reduce) { transition: none; }
+}
+
+// Before the script places the thumb (or without JS), the open tab still shows amber
+.learn-tabs:not(.is-ready) .nav-link.active { background: $amber; }
 
 // ---- Label tiles ----
 .term-tile {

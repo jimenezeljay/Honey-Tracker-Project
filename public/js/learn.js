@@ -129,6 +129,29 @@ const PURITY_STEPS = [
     }
   }
 
+  // ---------- Sliding highlight behind the open tab ----------
+  const tabBar = document.querySelector('.learn-tabs');
+  const thumb = tabBar?.querySelector('.learn-tabs__thumb');
+
+  function placeThumb() {
+    const active = tabBar?.querySelector('.nav-link.active');
+    if (!thumb || !active) return;
+    thumb.style.left = `${active.offsetLeft}px`;
+    thumb.style.width = `${active.offsetWidth}px`;
+  }
+
+  if (thumb) {
+    // First placement jumps straight there; after that it slides
+    thumb.style.transition = 'none';
+    placeThumb();
+    tabBar.classList.add('is-ready');
+    requestAnimationFrame(() => requestAnimationFrame(() => { thumb.style.transition = ''; }));
+
+    tabBar.addEventListener('shown.bs.tab', placeThumb);
+    window.addEventListener('resize', placeThumb);       // labels get shorter on phones
+    document.fonts?.ready.then(placeThumb);              // tab widths change once Inter loads
+  }
+
   window.addEventListener('hashchange', applyHash);
   applyHash();
 })();
