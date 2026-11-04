@@ -99,6 +99,74 @@ function productCard(listing) {
     </article>`;
 }
 
+// Cart and Saved for later, kept in this browser until the backend has accounts.
+//   HTCart.cart()          -> [{ listingId, qty }]
+//   HTCart.add(id, qty, max)  adds to a line (never past max)
+//   HTCart.saved()         -> [listingId, ...]
+// Later these become calls to the backend's cart; pages only use HTCart, so only this changes.
+const HTCart = (function () {
+  const CART_KEY = 'ht-cart';
+  const SAVED_KEY = 'ht-saved';
+
+  function read(key) {
+    try {
+      const value = JSON.parse(localStorage.getItem(key) || '[]');
+      return Array.isArray(value) ? value : [];
+    } catch (error) {
+      return []; // storage blocked or broken: start empty
+    }
+  }
+
+  function write(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (error) { /* storage blocked */ }
+    updateNavCount();
+  }
+
+  const cart = () => read(CART_KEY).filter(line => line && Number(line.qty) > 0);
+  const saved = () => read(SAVED_KEY).map(Number).filter(Boolean);
+  const count = () => cart().reduce((sum, line) => sum + Number(line.qty), 0);
+
+  function add(listingId, qty = 1, max = 10) {
+    const lines = cart();
+    const line = lines.find(l => l.listingId === Number(listingId));
+    if (line) line.qty = Math.min(max, line.qty + qty);
+    else lines.push({ listingId: Number(listingId), qty: Math.min(max, qty) });
+    write(CART_KEY, lines);
+  }
+
+  function setQty(listingId, qty) {
+    write(CART_KEY, cart().map(l => l.listingId === Number(listingId) ? { ...l, qty } : l));
+  }
+
+  function remove(listingId) {
+    write(CART_KEY, cart().filter(l => l.listingId !== Number(listingId)));
+  }
+
+  function saveForLater(listingId) {
+    remove(listingId);
+    write(SAVED_KEY, [...new Set([Number(listingId), ...saved()])]);
+  }
+
+  function unsave(listingId) {
+    write(SAVED_KEY, saved().filter(id => id !== Number(listingId)));
+  }
+
+  function moveToCart(listingId, max) {
+    unsave(listingId);
+    add(listingId, 1, max);
+  }
+
+  // The navbar's "Cart (3)"
+  function updateNavCount() {
+    document.querySelectorAll('[data-cart-count]').forEach(el => {
+      const n = count();
+      el.textContent = n ? `(${n})` : '';
+    });
+  }
+
+  return { cart, saved, count, add, setQty, remove, saveForLater, unsave, moveToCart, updateNavCount };
+})();
+
 // siteNav('map') -> the top bar, with "Map" marked as the current page
 function siteNav(active) {
   const link = (page, label) =>
@@ -118,6 +186,7 @@ function siteNav(active) {
             ${link('learn', 'Learn')}
           </ul>
           <div class="d-flex gap-2">
+            <a class="btn btn-link nav-cart${active === 'cart' ? ' active' : ''}" href="cart.html"${active === 'cart' ? ' aria-current="page"' : ''}><i class="bi bi-bag" aria-hidden="true"></i> Cart <span data-cart-count></span></a>
             <a class="btn btn-outline-secondary" href="signin.html">Sign in</a>
             <a class="btn btn-primary" href="get-started.html">Get started</a>
           </div>
@@ -158,6 +227,30 @@ document.addEventListener('click', event => {
   }
 });
 
+// Sliding highlight for .seg-tabs (Learn, Cart): moves the amber thumb to the open tab.
+function initSegTabs(bar) {
+  const thumb = bar?.querySelector('.seg-tabs__thumb');
+  if (!thumb) return () => {};
+
+  const place = () => {
+    const active = bar.querySelector('.nav-link.active');
+    if (!active) return;
+    thumb.style.left = `${active.offsetLeft}px`;
+    thumb.style.width = `${active.offsetWidth}px`;
+  };
+
+  // First placement jumps straight there; after that it slides
+  thumb.style.transition = 'none';
+  place();
+  bar.classList.add('is-ready');
+  requestAnimationFrame(() => requestAnimationFrame(() => { thumb.style.transition = ''; }));
+
+  bar.addEventListener('shown.bs.tab', place);
+  window.addEventListener('resize', place);   // labels get shorter on phones
+  document.fonts?.ready.then(place);          // tab widths change once Inter loads
+  return place;                               // call again if a tab's label changes
+}
+
 // Fill placeholders on the page:
 //   <div data-component="site-nav" data-active="map"></div>
 //   <div data-component="site-footer"></div>
@@ -168,6 +261,7 @@ document.querySelectorAll('[data-component="site-nav"]').forEach(el => {
 document.querySelectorAll('[data-component="site-footer"]').forEach(el => {
   el.outerHTML = siteFooter();
 });
+HTCart.updateNavCount();
 document.querySelectorAll('[data-badge]').forEach(el => {
   el.outerHTML = badge(el.dataset.badge);
 });

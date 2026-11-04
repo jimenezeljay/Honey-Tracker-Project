@@ -10,7 +10,6 @@
   const page = document.getElementById('trace');
   if (!page) return;
 
-  const CART_KEY = 'ht-cart';          // read later by cart.js
   const MAX_QTY = 10;
   const STEP_LABELS = { bloom: 'Bloom', harvest: 'Harvest', jarred: 'Jarred' };
 
@@ -228,20 +227,11 @@
     });
   }
 
-  // Saves { listingId, qty } in this browser for the Cart page, then opens it.
-  // Later this becomes a call to the backend's cart.
+  // Adds to the cart (HTCart in js/components.js), then opens the Cart page
   function addToCart(t, maxQty) {
     const input = document.getElementById('qty');
     const qty = Math.max(1, Math.min(maxQty, Number(input?.value) || 1));
-    try {
-      const cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
-      const line = cart.find(item => item.listingId === t.id);
-      if (line) line.qty = Math.min(maxQty, line.qty + qty);
-      else cart.push({ listingId: t.id, qty });
-      localStorage.setItem(CART_KEY, JSON.stringify(cart));
-    } catch (error) {
-      // Storage blocked (private window): still go to the cart page
-    }
+    HTCart.add(t.id, qty, maxQty);
     window.location.href = 'cart.html';
   }
 

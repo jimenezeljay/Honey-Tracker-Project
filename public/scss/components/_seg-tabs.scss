@@ -1,0 +1,55 @@
+// Tabs as one white block with an amber highlight that slides to the open tab.
+// Used on Learn and Cart. Markup (Bootstrap pills):
+//   <nav class="seg-tabs" aria-label="...">
+//     <div class="nav" role="tablist">
+//       <span class="seg-tabs__thumb" aria-hidden="true"></span>
+//       <button class="nav-link active" data-bs-toggle="pill" ...>One</button> ...
+//     </div>
+//   </nav>
+// Then call initSegTabs(navElement) from js/components.js to move the highlight.
+
+.seg-tabs {
+  max-width: 100%;
+
+  .nav {
+    position: relative;
+    flex-wrap: nowrap;
+    padding: .3rem;
+    background: #fff;
+    border: 1px solid $line;
+    border-radius: 999px;
+  }
+
+  .nav-link {
+    position: relative;
+    z-index: 1;
+    color: $ink-soft;
+    font-weight: 600;
+    white-space: nowrap;
+    border-radius: 999px;
+    padding: .55rem 1.1rem;
+    transition: color .25s ease;
+
+    &:hover { color: $ink; }
+    &.active { color: $ink; background: transparent; }
+
+    @include media-breakpoint-down(sm) { padding-inline: .85rem; }
+  }
+}
+
+.seg-tabs__thumb {
+  position: absolute;
+  z-index: 0;
+  top: .3rem;
+  bottom: .3rem;
+  left: 0;
+  width: 0;
+  border-radius: 999px;
+  background: $amber;
+  transition: left .3s cubic-bezier(.3, .7, .2, 1), width .3s cubic-bezier(.3, .7, .2, 1);
+
+  @media (prefers-reduced-motion: reduce) { transition: none; }
+}
+
+// Before the script places the highlight (or without JS), the open tab still shows amber
+.seg-tabs:not(.is-ready) .nav-link.active { background: $amber; }

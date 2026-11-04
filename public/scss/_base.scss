@@ -82,3 +82,17 @@ a {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+// A button that looks like a text link (Save for later, Remove)
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $amber-deep;
+  font-size: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: .15em;
+
+  &:hover { color: $ink; }
+}

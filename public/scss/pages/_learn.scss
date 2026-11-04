@@ -14,6 +14,7 @@ $liquid-gold:  #C98A12;  // Liquid icon
 }
 
 // ---- Title on the left, tabs on the right (tabs drop under the title on smaller screens) ----
+// The tabs themselves are .seg-tabs (components/_seg-tabs.scss).
 .learn-top {
   display: flex;
   flex-wrap: wrap;
@@ -24,53 +25,6 @@ $liquid-gold:  #C98A12;  // Liquid icon
 
   .page-head { margin-bottom: 0; }
 }
-
-// ---- Tabs: one white block; the amber thumb slides to the open tab (js/learn.js) ----
-.learn-tabs {
-  max-width: 100%;
-
-  .nav {
-    position: relative;
-    flex-wrap: nowrap;
-    padding: .3rem;
-    background: #fff;
-    border: 1px solid $line;
-    border-radius: 999px;
-  }
-
-  .nav-link {
-    position: relative;
-    z-index: 1;
-    color: $ink-soft;
-    font-weight: 600;
-    white-space: nowrap;
-    border-radius: 999px;
-    padding: .55rem 1.1rem;
-    transition: color .25s ease;
-
-    &:hover { color: $ink; }
-    &.active { color: $ink; background: transparent; }
-
-    @include media-breakpoint-down(sm) { padding-inline: .85rem; }
-  }
-}
-
-.learn-tabs__thumb {
-  position: absolute;
-  z-index: 0;
-  top: .3rem;
-  bottom: .3rem;
-  left: 0;
-  width: 0;
-  border-radius: 999px;
-  background: $amber;
-  transition: left .3s cubic-bezier(.3, .7, .2, 1), width .3s cubic-bezier(.3, .7, .2, 1);
-
-  @media (prefers-reduced-motion: reduce) { transition: none; }
-}
-
-// Before the script places the thumb (or without JS), the open tab still shows amber
-.learn-tabs:not(.is-ready) .nav-link.active { background: $amber; }
 
 // ---- Label tiles ----
 .term-tile {

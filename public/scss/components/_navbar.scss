@@ -123,3 +123,13 @@
   50%      { --bob: 1; }
 }
 
+
+// Cart link (count filled in by HTCart in js/components.js)
+.site-nav .nav-cart {
+  color: $ink-soft;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover, &.active { color: $ink; }
+  .bi { margin-right: .2rem; }
+}
