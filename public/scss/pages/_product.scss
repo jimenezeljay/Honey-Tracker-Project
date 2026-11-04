@@ -1,0 +1,380 @@
+// Product / trace page (wireframe 5, v2). Built by js/product.js.
+// Map pins and legend come from components/_map.scss; badge colors from components/_badges.scss.
+
+.trace {
+  padding-block: 1.5rem 3rem;
+
+  .breadcrumb { margin-bottom: .75rem; font-size: .9rem; }
+}
+
+// ---- Top ----
+.trace-head {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  margin-bottom: 1.25rem;
+}
+
+.trace-title {
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  margin: 0;
+}
+
+// Farm name button: looks like a dotted link, opens the farm popover
+.trace-farm {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $amber-deep;
+  font-weight: 600;
+  text-decoration: underline dotted;
+  text-underline-offset: .2em;
+}
+
+.trace-badges {
+  display: flex;
+  gap: .5rem;
+  font-size: 1.05rem;
+
+  a.badge { text-decoration: none; }
+}
+
+// ---- Bloom -> Harvest -> Jarred (always open) ----
+// A row with a line through the dots on desktop; a short list on phones.
+.trace-steps {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 1rem 1.25rem;
+  display: grid;
+  gap: .9rem;
+  background: #fff;
+  border: 1px solid $line;
+  border-radius: 1rem;
+
+  @include media-breakpoint-up(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    position: relative;
+
+    // The line joining the three dots
+    &::before {
+      content: "";
+      position: absolute;
+      top: calc(1rem + .45rem);
+      left: calc(1.25rem + .45rem);
+      right: calc(1.25rem + .45rem);
+      height: 2px;
+      background: rgba($amber, .45);
+    }
+  }
+}
+
+.trace-step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: .75rem;
+  position: relative;
+
+  @include media-breakpoint-up(md) {
+    grid-template-columns: 1fr;
+    row-gap: .35rem;
+
+    &:nth-child(2) { justify-items: center; text-align: center; }
+    &:nth-child(3) { justify-items: end; text-align: right; }
+  }
+}
+
+.trace-step__dot {
+  grid-row: span 2;
+  width: .9rem;
+  height: .9rem;
+  margin-top: .3rem;
+  border-radius: 50%;
+  background: $amber;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 1px $amber;
+  position: relative; // sits above the line
+
+  @include media-breakpoint-up(md) { grid-row: auto; margin-top: 0; }
+}
+
+.trace-step__label { font-weight: 600; }
+.trace-step__date  { color: $ink-soft; font-size: .9rem; }
+
+// ---- The three sections ----
+.trace-sections {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+
+.trace-section {
+  background: #fff;
+  border: 1px solid $line;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.trace-section__head {
+  margin: 0;
+  font-family: $font-family-sans-serif;
+  font-size: 1rem;
+}
+
+.trace-section__toggle {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: .9rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 0;
+  background: none;
+  color: $ink;
+  font-weight: 600;
+  text-align: left;
+
+  &::after {
+    content: "\F282"; // bootstrap-icons chevron-down
+    font-family: "bootstrap-icons";
+    transition: transform .2s ease;
+  }
+
+  &:not(.collapsed)::after { transform: rotate(180deg); }
+  &:not(.collapsed) { border-bottom: 1px solid $line; }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::after { transition: none; }
+  }
+}
+
+.trace-section__body { padding: 1.25rem; }
+
+// Where it's from: map beside pollen on wider screens
+.trace-where {
+  display: grid;
+  gap: 1.25rem;
+
+  @include media-breakpoint-up(sm) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.trace-map {
+  min-height: 16rem;
+
+  // Forage radius around an exact hive pin (approximate farms show .map-area instead)
+  .trace-map__radius {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 7rem;
+    height: 7rem;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: rgba($sage, .18);
+    border: 2px solid rgba($sage, .7);
+  }
+
+  .map-legend .key-radius {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: rgba($sage, .18);
+    border: 2px solid rgba($sage, .7);
+  }
+}
+
+.trace-label {
+  font-family: $font-family-sans-serif;
+  font-size: .85rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: $ink-soft;
+  margin: 0 0 .5rem;
+
+  &:not(:first-child) { margin-top: 1rem; }
+}
+
+.pollen-list,
+.trace-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pollen-row {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr 2.75rem;
+  align-items: center;
+  gap: .6rem;
+  margin-bottom: .45rem;
+  font-size: .95rem;
+}
+
+.pollen-row__track {
+  height: .7rem;
+  border-radius: 999px;
+  background: $cream;
+  overflow: hidden;
+}
+
+.pollen-row__bar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: $amber;
+}
+
+.pollen-row__pct { color: $ink-soft; text-align: right; }
+
+.trace-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+}
+
+.trace-chip {
+  padding: .25rem .7rem;
+  border-radius: 999px;
+  background: $raw-tint;
+  color: $raw-deep;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.trace-note {
+  margin: 1rem 0 0;
+  font-size: .85rem;
+  color: $ink-soft;
+}
+
+// The keeper
+.trace-keeper {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.trace-keeper__photo {
+  flex: none;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: $cream;
+  border: 1px solid $line;
+  color: $ink-soft;
+  font-size: 1.5rem;
+}
+
+.trace-keeper__name { font-weight: 600; margin-bottom: .2rem; }
+
+// How it's made
+.trace-facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: .6rem 1rem;
+  margin: 0;
+
+  dt { font-weight: 600; }
+  dd { margin: 0; }
+}
+
+// ---- Right column: photo + buy box ----
+.trace-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @include media-breakpoint-up(lg) {
+    position: sticky;
+    top: 1.5rem;
+  }
+}
+
+.trace-photo {
+  aspect-ratio: 4 / 3;
+  border-radius: 1rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid $line;
+  color: $line;
+  font-size: 3rem;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+.trace-buy {
+  flex-direction: column;
+  gap: .75rem;
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid $line;
+  border-radius: 1rem;
+
+  p { margin: 0; }
+}
+
+.trace-price {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.trace-buy__row {
+  display: flex;
+  gap: .6rem;
+
+  .qty-stepper { flex: none; }
+  .trace-cta { flex-grow: 1; }
+}
+
+.trace-cta,
+.trace-contact {
+  min-height: 3rem;
+  font-weight: 600;
+}
+
+.trace-delivery {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  padding: .75rem 1rem;
+  border-radius: $border-radius;
+  background: $cream;
+  font-size: .9rem;
+  color: $ink-soft;
+}
+
+// ---- Phones: sticky buy bar ----
+.trace-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: $zindex-sticky;
+  background: #fff;
+  border-top: 1px solid $line;
+  box-shadow: 0 -4px 16px rgba($ink, .08);
+  padding: .75rem 1rem calc(.75rem + env(safe-area-inset-bottom));
+}
+
+.trace-bar__inner {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+
+  .trace-cta { flex-grow: 1; }
+  .btn { min-height: 3rem; font-weight: 600; }
+}
+
+.trace-bar__price {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+
+  span { font-size: .8rem; color: $ink-soft; }
+}

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Honey trace | Honey Tracker</title>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Compiled CSS (already includes Bootstrap) -->
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <!-- Navbar and footer are built by js/components.js (edit them there, once) -->
+  <div data-component="site-nav" data-active="marketplace"></div>
+
+  <!-- Wireframe 5 (v2): trace on the left, buying on the right. On phones it's one column
+       with a sticky buy bar at the bottom.
+       product.html?id=4     a Marketplace listing
+       product.html?batch=11 a QR label; the batch may not be sold here (then "Visit keeper's shop")
+       Everything inside [data-fill] is filled in by js/product.js. -->
+  <main class="container trace" id="trace" aria-busy="true">
+    <div class="row g-4 g-lg-5">
+
+      <!-- Photo + buy box. First on phones, right column on desktop -->
+      <div class="col-12 col-lg-5 order-lg-2">
+        <div class="trace-aside">
+          <div class="trace-photo" data-fill="photo"><i class="bi bi-image" aria-hidden="true"></i></div>
+          <div class="trace-buy d-none d-lg-flex" data-fill="buy"></div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-7 order-lg-1">
+        <nav aria-label="breadcrumb" data-fill="breadcrumb"></nav>
+
+        <header class="trace-head">
+          <h1 class="trace-title" data-fill="title">Loading…</h1>
+          <p class="trace-from mb-0" data-fill="from"></p>
+          <div class="trace-badges" data-fill="badges"></div>
+        </header>
+
+        <!-- Bloom → Harvest → Jarred. Always shown, never collapsed -->
+        <ol class="trace-steps" data-fill="steps" aria-label="Chain of custody"></ol>
+
+        <!-- Three sections; "Where it's from" starts open -->
+        <div class="trace-sections">
+          <section class="trace-section">
+            <h2 class="trace-section__head">
+              <button class="trace-section__toggle" type="button" data-bs-toggle="collapse" data-bs-target="#secWhere" aria-expanded="true" aria-controls="secWhere">Where it's from</button>
+            </h2>
+            <div class="collapse show" id="secWhere">
+              <div class="trace-section__body trace-where" data-fill="where"></div>
+            </div>
+          </section>
+
+          <section class="trace-section">
+            <h2 class="trace-section__head">
+              <button class="trace-section__toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#secKeeper" aria-expanded="false" aria-controls="secKeeper">The keeper</button>
+            </h2>
+            <div class="collapse" id="secKeeper">
+              <div class="trace-section__body" data-fill="keeper"></div>
+            </div>
+          </section>
+
+          <section class="trace-section">
+            <h2 class="trace-section__head">
+              <button class="trace-section__toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#secMade" aria-expanded="false" aria-controls="secMade">How it's made</button>
+            </h2>
+            <div class="collapse" id="secMade">
+              <div class="trace-section__body" data-fill="made"></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Phones only: sticky bar with the main action -->
+  <div class="trace-bar d-lg-none" data-fill="bar"></div>
+
+  <div data-component="site-footer"></div>
+
+  <!-- Shared navbar + footer first (local file, so they appear without waiting on the CDN) -->
+  <script src="js/components.js"></script>
+  <!-- Bootstrap JS (collapse, tooltips, popovers). Goes at the end of body -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Your JS -->
+  <script src="js/main.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/product.js"></script>
+</body>
+</html>
