@@ -232,27 +232,31 @@
     window.location.href = 'cart.html';
   }
 
-  // ---- Desktop: photo sized so the buy box ends level with the last section ----
-  // Measured with the sections closed, so opening one doesn't stretch the photo.
-  // Phones (one column) keep the normal 4:3 photo.
-  const desktop = window.matchMedia('(min-width: 992px)');
+  // ---- TEMPORARY: Wide / Narrow switch (bottom right, desktop only) ----
+  // Lets the team compare the two widths. Remembered in this browser; ?layout=narrow also works.
+  // Delete this block, the .layout-switch markup and its styles once one is picked.
+  const LAYOUT_KEY = 'ht-trace-layout';
 
-  function fitPhoto() {
-    const main = document.getElementById('traceMain');
-    const aside = document.querySelector('.trace-aside');
-    const photo = fill('photo');
-    const buy = fill('buy');
-    if (!main || !aside || !photo || !buy) return;
-
-    if (!desktop.matches) { photo.style.height = ''; return; }
-
-    // Left column height without any open section bodies
-    const openBodies = [...main.querySelectorAll('.collapse')].reduce((sum, el) => sum + el.offsetHeight, 0);
-    const leftHeight = main.offsetHeight - openBodies;
-    const gap = parseFloat(getComputedStyle(aside).rowGap) || 0;
-    const height = Math.max(120, leftHeight - buy.offsetHeight - gap);
-    photo.style.height = `${height}px`;
+  function setLayout(layout) {
+    page.classList.toggle('trace--narrow', layout === 'narrow');
+    document.querySelectorAll('.layout-switch [data-layout]').forEach(button => {
+      const on = button.dataset.layout === layout;
+      button.classList.toggle('active', on);
+      button.setAttribute('aria-pressed', String(on));
+    });
+    try { localStorage.setItem(LAYOUT_KEY, layout); } catch (error) { /* storage blocked */ }
   }
+
+  function initLayoutSwitch() {
+    let saved = new URLSearchParams(window.location.search).get('layout');
+    if (!saved) { try { saved = localStorage.getItem(LAYOUT_KEY); } catch (error) { saved = null; } }
+    setLayout(saved === 'narrow' ? 'narrow' : 'wide');
+    document.querySelectorAll('.layout-switch [data-layout]').forEach(button => {
+      button.addEventListener('click', () => setLayout(button.dataset.layout));
+    });
+  }
+
+  initLayoutSwitch();
 
   // ---- Load ----
 
@@ -275,10 +279,6 @@
       page.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => bootstrap.Popover.getOrCreateInstance(el));
     }
     page.setAttribute('aria-busy', 'false');
-
-    fitPhoto();
-    window.addEventListener('resize', fitPhoto);
-    document.fonts?.ready.then(fitPhoto); // headings shift a little once Lora loads
   }
 
   load();
