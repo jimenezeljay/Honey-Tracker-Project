@@ -38,8 +38,9 @@
              only shares an approximate location. Search opens the Map page: map.html?q=... -->
         <div class="map-box home-map__box">
           <div class="home-map__canvas" id="homeMap" aria-label="Map of certified hives"></div>
-          <form class="map-search" role="search" action="map.html" method="get">
+          <form class="map-search search-pill search-pill--sm" role="search" action="map.html" method="get">
             <label class="visually-hidden" for="mapSearch">Search this map</label>
+            <i class="bi bi-search" aria-hidden="true"></i>
             <input class="form-control" id="mapSearch" name="q" type="search" placeholder="Search this map">
           </form>
           <div class="map-legend">
