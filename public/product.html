@@ -29,10 +29,9 @@
        On phones it's one column with a sticky buy bar at the bottom.
        product.html?id=4     a Marketplace listing
        product.html?batch=11 a QR label; the batch may not be sold here (then "Visit keeper's shop")
-       Everything inside [data-fill] is filled in by js/product.js.
-       TEMPORARY: .trace--narrow is the narrower option, switched by the toggle at the bottom right. -->
+       Everything inside [data-fill] is filled in by js/product.js. -->
   <main class="container trace" id="trace" aria-busy="true">
-    <div class="row g-4 g-lg-5 trace-top">
+    <div class="row g-4 g-lg-5 align-items-lg-center trace-top">
       <div class="col-12 col-lg-6">
         <div class="trace-photo" data-fill="photo"><i class="bi bi-image" aria-hidden="true"></i></div>
       </div>
@@ -87,14 +86,8 @@
     </div>
   </main>
 
-  <!-- TEMPORARY: switch between the wide and narrow layouts (desktop only). Remove once one is picked. -->
-  <div class="layout-switch d-none d-lg-flex" role="group" aria-label="Page width">
-    <button type="button" class="btn btn-sm" data-layout="wide">Wide</button>
-    <button type="button" class="btn btn-sm" data-layout="narrow">Narrow</button>
-  </div>
-
   <!-- Phones only: sticky bar with the main action -->
-  <div class="trace-bar d-lg-none" data-fill="bar"></div>
+  <aside class="trace-bar d-lg-none" data-fill="bar" aria-label="Buy this honey"></aside>
 
   <div data-component="site-footer"></div>
 
