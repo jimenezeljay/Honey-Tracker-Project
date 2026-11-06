@@ -17,8 +17,22 @@
 
 .market-tools {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: .75rem;
+
+  // Phones and tablets: search gets its own full-width row, Filters and Sort sit below it
+  @include media-breakpoint-down(lg) { width: 100%; }
+}
+
+.market-search {
+  width: 100%;
+
+  @include media-breakpoint-up(lg) { width: 18rem; }
+
+  .input-group-text, .form-control { background-color: #fff; }
+  .input-group-text { color: $ink-soft; border-right: 0; }
+  .form-control { border-left: 0; }
 }
 
 .market-sort {

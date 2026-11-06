@@ -19,6 +19,7 @@
     max: document.getElementById('priceMax'),
     season: document.getElementById('seasonSelect'),
     sort: document.getElementById('sortSelect'),
+    search: document.getElementById('searchInput'),
     count: document.getElementById('resultCount'),
     filterCount: document.getElementById('filterCount'),
     showResults: document.getElementById('showResults'),
@@ -79,6 +80,7 @@
       min: number('min'),
       max: number('max'),
       season: data.get('season') || '',
+      q: (data.get('q') || '').trim().toLowerCase(),
       sort: data.get('sort') || 'nearest'
     };
   }
@@ -94,6 +96,7 @@
     setSelect(el.state, params.get('state'));
     setSelect(el.season, params.get('season'));
     setSelect(el.sort, params.get('sort'));
+    el.search.value = params.get('q') || '';
     el.verified.checked = params.get('verified') === '1';
     el.min.value = params.get('min') || '';
     el.max.value = params.get('max') || '';
@@ -106,6 +109,7 @@
   // Keep the URL in step with the form, leaving out empty filters and the default sort
   function writeUrl(f) {
     const params = new URLSearchParams();
+    if (f.q) params.set('q', f.q);
     if (f.type) params.set('type', f.type);
     if (f.texture) params.set('texture', f.texture);
     if (f.verified) params.set('verified', '1');
@@ -140,6 +144,11 @@
     if (f.min !== null && listing.price < f.min) return false;
     if (f.max !== null && listing.price > f.max) return false;
     if (f.season && listing.season !== f.season) return false;
+    if (f.q) {
+      // Every word has to appear somewhere: "clover sunrise" finds clover from Sunrise Farm
+      const text = [listing.title, listing.honeyType, listing.farmName, listing.state, listing.texture].join(' ').toLowerCase();
+      if (!f.q.split(/\s+/).every(word => text.includes(word))) return false;
+    }
     return true;
   }
 
@@ -186,6 +195,7 @@
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   el.sort.addEventListener('change', render); // lives outside the form element (form="filterForm")
+  el.search.addEventListener('input', render); // same: sits in the header, joined to the form by form="filterForm"
   form.addEventListener('submit', event => event.preventDefault());
   // "reset" fires before the fields clear, so render on the next tick
   form.addEventListener('reset', () => setTimeout(render));
