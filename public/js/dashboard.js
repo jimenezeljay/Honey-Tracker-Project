@@ -7,37 +7,37 @@ function formatDate(isoDate) {
   return new Date(isoDate + 'T00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-// Placeholder map until the shared real map is on main. Places markers in the box
-// by lat/lng: a pin per hive at exact farms, one dashed area at approximate farms
-// (they never reveal their real hive spots).
-function apiaryMap(farms, hives) {
-  const markers = farms.flatMap(farm => farm.precision === 'exact'
-    ? hives.filter(hive => hive.farmId === farm.id).map(hive => ({ kind: 'map-pin', lat: hive.lat, lng: hive.lng, title: `${farm.name}, hive ${hive.label}` }))
-    : [{ kind: 'map-area', lat: farm.lat, lng: farm.lng, title: `${farm.name}, approximate area` }]);
-
-  const lats = markers.map(marker => marker.lat);
-  const lngs = markers.map(marker => marker.lng);
-  // A value's place between lo% and hi% (the middle if every marker shares it)
-  const place = (value, values, lo, hi) => {
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    return max === min ? (lo + hi) / 2 : lo + ((value - min) / (max - min)) * (hi - lo);
-  };
-
-  const spans = markers.map(marker => {
-    const left = place(marker.lng, lngs, 20, 80);
-    const top = place(marker.lat, lats, 62, 22); // north is up; stays clear of the legend
-    return `<span class="${marker.kind}" style="left: ${left}%; top: ${top}%" title="${escapeHtml(marker.title)}"></span>`;
-  }).join('');
+// The keeper's own farms on the real map (js/maps.js): a pin and forage circle per hive
+// at exact farms, one dashed area at approximate farms (they never reveal their hive spots).
+function apiaryMap(farms) {
+  const hasExact = farms.some(farm => farm.precision === 'exact');
+  const hasArea = farms.some(farm => farm.precision !== 'exact');
+  const legend = [
+    hasExact ? '<span><i class="key-pin"></i>Hive</span><span><i class="key-radius"></i>Forage area</span>' : '',
+    hasArea ? '<span><i class="key-area"></i>Approximate area</span>' : ''
+  ].join('');
 
   return `
-    <div class="map-box" role="img" aria-label="Map of your apiaries: ${escapeHtml(farms.map(farm => farm.name).join(', '))}">
-      ${spans}
-      <div class="map-legend">
-        <span><i class="key-pin"></i>Exact hive</span>
-        <span><i class="key-area"></i>Approximate area</span>
-      </div>
+    <div class="map-box dash-map">
+      <div class="dash-map__canvas" id="apiaryCanvas" aria-label="Map of your apiaries: ${escapeHtml(farms.map(farm => farm.name).join(', '))}"></div>
+      <div class="map-legend">${legend}</div>
     </div>`;
+}
+
+// Runs after apiaryMap's markup is on the page and the page is visible.
+function drawApiaryMap(farms, hives) {
+  const el = document.getElementById('apiaryCanvas');
+  if (!el || typeof HTMap === 'undefined' || !farms.length) return;
+
+  const map = HTMap.create(el, { center: [farms[0].lat, farms[0].lng], zoom: 10 });
+  if (!map) return;
+
+  const layers = farms.flatMap(farm => {
+    const { markers, circles, areas, exact } = HTMap.farmMarkers(farm, { hives: hives.filter(hive => hive.farmId === farm.id) });
+    return exact ? [...circles, ...markers] : areas;
+  });
+  const group = L.featureGroup(layers).addTo(map);
+  map.fitBounds(group.getBounds(), { padding: [24, 24], maxZoom: 12 });
 }
 
 function harvestItem(batch) {
@@ -88,7 +88,7 @@ function renderDashboard({ keeper, farms, hives, batches, listings }) {
     statTile('Listings', listings.length, 'jar')
   ].map(tile => `<div class="col-6 col-xl-3">${tile}</div>`).join('');
 
-  document.getElementById('apiaryMap').innerHTML = apiaryMap(farms, hives);
+  document.getElementById('apiaryMap').innerHTML = apiaryMap(farms);
 
   const recent = [...batches].sort((a, b) => b.harvestDate.localeCompare(a.harvestDate)).slice(0, 3);
   document.getElementById('recentHarvests').innerHTML = recent.length
@@ -114,6 +114,7 @@ getKeeperDashboard().then(data => {
   }
   renderDashboard(data);
   document.getElementById('keeperPage').hidden = false;
+  drawApiaryMap(data.farms, data.hives); // after the page shows, so Leaflet can measure the box
 
   // The page was hidden when the browser tried to jump to #farms or #listings, so do it now.
   // Wait for load, or the browser's own attempt can cancel this one.

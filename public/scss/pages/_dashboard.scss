@@ -25,6 +25,14 @@
 
 .dashboard-section .map-box { min-height: 300px; }
 
+// Real map (js/maps.js) fills the box; the legend sits above Leaflet's layers
+.dash-map {
+  background: #E2E6DE;
+
+  .dash-map__canvas { position: absolute; inset: 0; z-index: 0; }
+  .map-legend { z-index: 1001; bottom: 1.6rem; } // clear of the attribution
+}
+
 .empty-icon__svg {
   width: 4rem;
   height: 4rem;
