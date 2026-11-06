@@ -60,6 +60,7 @@
 
   .key-pin { width: .75rem; height: .75rem; border-radius: 50%; background: $amber; }
   .key-area { width: 1rem; height: 1rem; border-radius: 50%; background: rgba($amber, .18); border: 2px dashed $amber; }
+  .key-radius { width: 1rem; height: 1rem; border-radius: 50%; background: rgba($sage, .18); border: 2px solid rgba($sage, .7); }
 }
 
 // ---- Real maps (Leaflet + OpenStreetMap), built by js/maps.js ----
