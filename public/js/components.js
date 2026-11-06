@@ -227,6 +227,7 @@ function siteFooter() {
         <nav class="d-flex flex-wrap gap-3" aria-label="Footer">
           <a href="#">About</a>
           <a href="learn.html">Learn</a>
+          <a href="find-your-honey.html">Trace a jar</a>
           <a href="get-started.html">Become a keeper</a>
           <a href="volunteer.html">Volunteer</a>
           <a href="#">Contact</a>
