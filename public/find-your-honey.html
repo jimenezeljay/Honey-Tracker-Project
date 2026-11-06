@@ -31,7 +31,8 @@
         <p class="lead mb-4">Bought a jar elsewhere? Type the code under its QR.</p>
         <form id="codeForm" role="search" novalidate>
           <label class="visually-hidden" for="jarCode">Jar code</label>
-          <div class="input-group input-group-lg">
+          <div class="search-pill search-pill--action">
+            <i class="bi bi-upc-scan" aria-hidden="true"></i>
             <input class="form-control" id="jarCode" name="code" type="text" placeholder="HT-0011"
                    autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="codeError">
             <button class="btn btn-primary" type="submit">Trace it</button>
