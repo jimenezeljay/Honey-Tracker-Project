@@ -5,6 +5,7 @@
 //     <input class="form-control" type="search" ...>
 //   </div>
 // .search-pill--sm is the shorter version that floats over a map.
+// .pill-btn (bottom of this file) is the matching round button, e.g. Filters and Sort.
 .search-pill {
   display: flex;
   align-items: center;
@@ -52,4 +53,39 @@
   padding-left: .95rem;
 
   .form-control { font-size: .95rem; }
+}
+
+// Round white button that sits next to a search pill (Filters, Sort)
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  height: 3rem;
+  padding: 0 1.1rem;
+  font-weight: 600;
+  color: $ink;
+  white-space: nowrap;
+  background: #fff;
+  border: 1px solid rgba($ink-soft, .4);
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba($ink, .06);
+  transition: border-color .15s ease, box-shadow .15s ease;
+
+  i { color: $ink-soft; font-size: 1.05rem; }
+  &.dropdown-toggle::after { display: none; } // uses a chevron icon instead
+  .pill-btn__chevron { font-size: .75rem; margin-left: -.1rem; }
+
+  &:hover { border-color: rgba($ink-soft, .65); }
+  &:focus-visible { outline: none; border-color: $amber; box-shadow: 0 0 0 .25rem rgba($amber, .25); }
+}
+
+// Small amber count inside a pill button ("Filters 2")
+.pill-btn__count {
+  min-width: 1.4rem;
+  padding: .1rem .4rem;
+  font-size: .75rem;
+  text-align: center;
+  color: $ink;
+  background: $amber;
+  border-radius: 999px;
 }

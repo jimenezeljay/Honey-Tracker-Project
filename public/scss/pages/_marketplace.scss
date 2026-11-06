@@ -1,4 +1,5 @@
-// Marketplace (wireframe 4): title + sort, filter column, card grid.
+// Marketplace (wireframe 4): title, search, Filters + Sort buttons, active-filter chips, card grid.
+// Filters open in a slide-in panel on every screen size.
 
 .market {
   padding-block: 2.5rem 1rem;
@@ -33,37 +34,63 @@
   }
 }
 
-.market-sort {
+// Sort menu under the Sort button
+.sort-menu {
+  --bs-dropdown-bg: #fff;
+  --bs-dropdown-border-color: #{$line};
+  --bs-dropdown-border-radius: .75rem;
+  --bs-dropdown-padding-x: .4rem;
+  --bs-dropdown-link-active-bg: #{$cream};
+  --bs-dropdown-link-active-color: #{$ink};
+  --bs-dropdown-link-hover-bg: #{$cream};
+  min-width: 13rem;
+  box-shadow: 0 8px 24px rgba($ink, .12);
+
+  .dropdown-item {
+    display: flex;
+    justify-content: space-between;
+    border-radius: .5rem;
+    padding-block: .55rem;
+
+    &.active { font-weight: 600; }
+    &.active::after { content: "\F26E"; font-family: "bootstrap-icons"; } // check2
+  }
+}
+
+// Active filters, under the header
+.filter-chips {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: .5rem;
+  margin: -.25rem 0 1rem;
 
-  .form-select { width: auto; background-color: #fff; }
+  .btn-link { color: $amber-deep; font-weight: 600; }
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .3rem .55rem .3rem .8rem;
+  font-size: .9rem;
+  color: $ink;
+  background: #fff;
+  border: 1px solid $line;
+  border-radius: 999px;
+
+  i { font-size: .7rem; color: $ink-soft; }
+  &:hover { border-color: rgba($ink-soft, .6); }
 }
 
 .market-near {
   margin-bottom: 1.25rem;
 }
 
-// Filter column: a white panel on desktop, a white slide-in sheet on smaller screens
+// Filters: white slide-in sheet from the left
 .filter-panel {
   --bs-offcanvas-bg: #fff;
   --bs-body-bg: #fff; // inputs, selects and checkboxes inside are white too, not cream
-
-  @include media-breakpoint-up(lg) {
-    position: sticky;
-    top: 1.5rem;
-    // Bootstrap's offcanvas-lg forces a see-through background on wide screens; win it back
-    background-color: #fff !important; // stylelint-disable-line declaration-no-important
-    border: 1px solid $line;
-    border-radius: 1rem;
-    padding: 1.25rem;
-  }
-
-  // Bootstrap's offcanvas-lg body has padding meant for the sheet; drop it inline
-  .offcanvas-body {
-    @include media-breakpoint-up(lg) { padding: 0; }
-  }
 }
 
 .filter-form {
@@ -116,14 +143,9 @@
   gap: .25rem;
 
   .btn-link { color: $amber-deep; font-weight: 600; }
-
-  @include media-breakpoint-up(lg) {
-    align-items: flex-start;
-    .btn-link { padding-inline: 0; }
-  }
 }
 
-// The no-matches state sits inside the results column, so it needs less room
+// The no-matches state sits inside the results, so it needs less room
 #noResults { padding-block: 3rem; }
 
 // ---- Filter controls in each badge's own colors ----
