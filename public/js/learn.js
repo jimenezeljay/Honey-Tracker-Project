@@ -129,6 +129,9 @@ const PURITY_STEPS = [
     }
   }
 
+  // Sliding highlight behind the open tab (initSegTabs in js/components.js)
+  initSegTabs(document.querySelector('.learn-tabs'));
+
   window.addEventListener('hashchange', applyHash);
   applyHash();
 })();

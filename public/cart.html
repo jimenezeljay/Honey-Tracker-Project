@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cart | Honey Tracker</title>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Compiled CSS (already includes Bootstrap) -->
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <!-- Navbar and footer are built by js/components.js (edit them there, once) -->
+  <div data-component="site-nav" data-active="cart"></div>
+
+  <!-- Wireframe 6 (v2): Cart and Saved for later tabs. Honey is grouped by keeper because each
+       keeper ships separately. Shipping or pickup is chosen at checkout.
+       The cart lives in this browser for now (HTCart in js/components.js). Built by js/cart.js. -->
+  <main class="container cart" id="cartPage" aria-busy="true">
+    <div class="cart-top">
+      <header class="page-head">
+        <h1 class="mb-1">Cart</h1>
+        <p class="text-soft mb-0" id="cartSub">&nbsp;</p>
+      </header>
+
+      <nav class="seg-tabs" aria-label="Cart sections">
+        <div class="nav" role="tablist">
+          <span class="seg-tabs__thumb" aria-hidden="true"></span>
+          <button class="nav-link active" id="btn-cart" data-bs-toggle="pill" data-bs-target="#tab-cart" type="button" role="tab" aria-controls="tab-cart" aria-selected="true">Cart <span data-count="cart"></span></button>
+          <button class="nav-link" id="btn-saved" data-bs-toggle="pill" data-bs-target="#tab-saved" type="button" role="tab" aria-controls="tab-saved" aria-selected="false"><span class="d-none d-sm-inline">Saved for later</span><span class="d-sm-none">Saved</span> <span data-count="saved"></span></button>
+        </div>
+      </nav>
+    </div>
+
+    <div class="tab-content">
+      <section class="tab-pane fade show active" id="tab-cart" role="tabpanel" aria-labelledby="btn-cart" tabindex="0">
+        <div class="cart-layout" id="cartFull">
+          <div class="cart-groups" id="cartGroups"></div>
+
+          <aside class="cart-summary" aria-labelledby="summaryTitle">
+            <h2 class="cart-summary__title" id="summaryTitle">Order summary</h2>
+            <dl class="cart-summary__rows" id="summaryRows"></dl>
+            <a class="btn btn-primary cart-summary__checkout" href="checkout.html">Checkout</a>
+            <p class="cart-summary__note mb-0">Choose shipping or pickup at checkout.</p>
+          </aside>
+        </div>
+
+        <div class="cart-empty" id="cartEmpty" hidden>
+          <span class="cart-empty__icon" aria-hidden="true"><i class="bi bi-bag"></i></span>
+          <h2 class="cart-empty__title">Un-bee-lievably empty.</h2>
+          <p class="text-soft">Find honey traced to its hive.</p>
+          <a class="btn btn-primary" href="marketplace.html">Browse the Marketplace</a>
+        </div>
+      </section>
+
+      <section class="tab-pane fade" id="tab-saved" role="tabpanel" aria-labelledby="btn-saved" tabindex="0">
+        <ul class="saved-list" id="savedList"></ul>
+        <p class="cart-note" id="savedNote">Saved honey isn't held, so it can sell out.</p>
+        <div class="cart-empty" id="savedEmpty" hidden>
+          <h2 class="cart-empty__title">Nothing saved yet.</h2>
+          <p class="text-soft mb-0">Tap &ldquo;Save for later&rdquo; on anything in your cart.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Phones only: total + Checkout always in reach -->
+  <div class="cart-bar d-lg-none" id="cartBar" hidden>
+    <div class="cart-bar__total"><strong id="barTotal"></strong><span>Total (est.)</span></div>
+    <a class="btn btn-primary" href="checkout.html">Checkout</a>
+  </div>
+
+  <div data-component="site-footer"></div>
+
+  <!-- Shared navbar + footer first (local file, so they appear without waiting on the CDN) -->
+  <script src="js/components.js"></script>
+  <!-- Bootstrap JS (tabs, tooltips). Goes at the end of body -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Your JS -->
+  <script src="js/main.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/cart.js"></script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+// Map page (wireframes 2 and 3). Built by js/map.js; pins and circles come from
+// components/_map.scss and js/maps.js.
+//
+// Desktop: panel on the left (search + layers on top, farms in view below), map on the right.
+// Phones: search + layers, then the map, then the list.
+
+.map-page {
+  display: grid;
+  grid-template-areas: "title" "controls" "stage" "results";
+  gap: 1rem;
+  padding: 2.5rem 1rem 1rem;
+
+  @include media-breakpoint-up(lg) {
+    grid-template-columns: 22rem minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas: "title stage" "controls stage" "results stage"; // map starts level with the title
+    gap: 0 1.25rem;
+    height: calc(100vh - 4.5rem); // fills the screen under the navbar
+    min-height: 40rem;
+    padding: 2.5rem 1.25rem 1.25rem; // same top space as Marketplace
+  }
+}
+
+.map-page > .page-head {
+  grid-area: title;
+  margin-bottom: 1rem;
+
+  @include media-breakpoint-up(lg) { margin-bottom: 1.25rem; }
+}
+
+.map-label {
+  font-family: $font-family-sans-serif;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: $ink-soft;
+  margin: 0 0 .5rem;
+}
+
+// ---- Search and layers ----
+// White card holding the search box and layer switches
+.map-controls {
+  grid-area: controls;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid $line;
+  border-radius: 1rem;
+
+  @include media-breakpoint-up(lg) { margin-bottom: 1.25rem; }
+}
+
+.map-layers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem 1.25rem;
+  margin: 0;
+
+  legend { float: none; width: 100%; }
+
+  @include media-breakpoint-up(lg) { flex-direction: column; }
+}
+
+// ---- Map ----
+.map-stage {
+  grid-area: stage;
+  position: relative;
+  min-height: 60vh;
+  border: 1px solid $line;
+  border-radius: 1rem;
+  overflow: hidden;
+
+  @include media-breakpoint-up(lg) { min-height: 0; }
+
+  .map-legend { z-index: 1001; bottom: 1.6rem; }
+}
+
+.map-stage__canvas {
+  position: absolute;
+  inset: 0;
+}
+
+// Numbered cluster: how many farms are grouped there
+.ht-cluster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba($amber, .3);
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: $amber;
+    color: $ink;
+    font-weight: 700;
+    font-size: .9rem;
+    border: 2px solid #fff;
+  }
+}
+
+// ---- Farm card (wireframe 3): top right on desktop, bottom on phones ----
+.farm-card {
+  position: absolute;
+  z-index: 1002;
+  left: .75rem;
+  right: .75rem;
+  bottom: .75rem;
+  max-height: 70%;
+  overflow-y: auto;
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid $line;
+  border-radius: 1rem;
+  box-shadow: 0 8px 28px rgba($ink, .16);
+
+  @include media-breakpoint-up(md) {
+    left: auto;
+    bottom: auto;
+    top: .75rem;
+    width: 21rem;
+    max-height: calc(100% - 1.5rem);
+  }
+
+  p { margin-bottom: .5rem; }
+}
+
+.farm-card__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.farm-card__where { font-size: .85rem; color: $ink-soft; }
+
+.farm-card__name {
+  font-size: 1.5rem;
+  margin: 0 2rem .25rem 0;
+
+  &:focus { outline: none; }
+}
+
+.farm-card__keeper { color: $ink-soft; }
+
+.farm-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin-bottom: .75rem;
+}
+
+.farm-card__note {
+  font-size: .85rem;
+  color: $amber-deep;
+}
+
+.farm-card__honey {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+
+  a {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .6rem .8rem;
+    border: 1px solid $line;
+    border-radius: $border-radius;
+    text-decoration: none;
+    font-weight: 600;
+
+    &:hover { background: $cream; }
+  }
+}
+
+.farm-card__price { color: $ink-soft; font-weight: 400; }
+
+// ---- Farms in view ----
+.map-results {
+  grid-area: results;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+
+  @include media-breakpoint-up(lg) { overflow: hidden; }
+}
+
+.map-results__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+
+  @include media-breakpoint-up(lg) {
+    overflow-y: auto;
+    padding-right: .25rem;
+  }
+}
+
+.map-result {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: .75rem;
+  align-items: center;
+  padding: .75rem 1rem;
+  text-align: left;
+  background: #fff;
+  border: 1px solid $line;
+  border-radius: .75rem;
+  color: $ink;
+
+  &:hover { border-color: $amber; }
+}
+
+.map-result__name { font-weight: 600; }
+.map-result__place { grid-row: 2; color: $ink-soft; font-size: .9rem; }
+.map-result__badges { grid-row: 1 / span 2; grid-column: 2; display: flex; gap: .3rem; }
+
+.map-results__empty {
+  padding: 1rem;
+  background: #fff;
+  border: 1px dashed $line;
+  border-radius: .75rem;
+  color: $ink-soft;
+}

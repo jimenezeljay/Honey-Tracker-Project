@@ -7,17 +7,26 @@
 //   async function getListings() { return (await fetch(API + '/listings')).json(); }
 // and every page keeps working unchanged.
 //
+// Moving servers: set API_BASE once and every helper below uses it.
+//   ''        -> the API lives on the same server as the site (e.g. /api/listings)
+//   'https://api.example.org' -> a separate API server
+// It's unused until the helpers switch to fetch(); then only this line changes per server.
+const API_BASE = '';
+
 // Every name, farm and number here is invented sample data.
 // Units match the wireframes: prices in USD, harvests in lb, jars in oz.
 
 const MOCK = {
+  // Set by the keeper (Mr. Gallic's checkout list): ship or pickup, shipping cost and
+  // turnaround, and an optional link to their own shop for jars sold elsewhere.
+  // Their address, email and phone are private and never sent to the page.
   keepers: [
-    { id: 1, displayName: 'Ruth Hollis',    photo: null, bio: 'Third-generation keeper on the Ohio River hills.',      applicationStatus: 'approved', certification: 'certified' },
-    { id: 2, displayName: 'Daniel Ostrow',  photo: null, bio: 'Hobbyist turned keeper; hives on old orchard ground.',   applicationStatus: 'approved', certification: 'certified' },
-    { id: 3, displayName: 'Mara Lindqvist', photo: null, bio: 'Small apiary beside a wildflower meadow restoration.',   applicationStatus: 'approved', certification: 'certified' },
-    { id: 4, displayName: 'Joe Pacheco',    photo: null, bio: 'Keeps bees near buckwheat and clover fields.',          applicationStatus: 'approved', certification: 'pending' },
-    { id: 5, displayName: 'Anne Whitfield', photo: null, bio: 'Basswood and goldenrod country, high in the hills.',     applicationStatus: 'approved', certification: 'certified' },
-    { id: 6, displayName: 'Sam Okafor',     photo: null, bio: 'Moves hives with the citrus bloom each spring.',         applicationStatus: 'approved', certification: 'certified' }
+    { id: 1, displayName: 'Ruth Hollis',    photo: null, bio: 'Third-generation keeper on the Ohio River hills.',      applicationStatus: 'approved', certification: 'certified', shipping: { ships: true,  cost: 6, turnaround: '2–3 days' }, pickup: true,  shopUrl: 'https://example.com/sunrise-farm' },
+    { id: 2, displayName: 'Daniel Ostrow',  photo: null, bio: 'Hobbyist turned keeper; hives on old orchard ground.',   applicationStatus: 'approved', certification: 'certified', shipping: { ships: true,  cost: 7, turnaround: '3–5 days' }, pickup: false, shopUrl: null },
+    { id: 3, displayName: 'Mara Lindqvist', photo: null, bio: 'Small apiary beside a wildflower meadow restoration.',   applicationStatus: 'approved', certification: 'certified', shipping: { ships: false, cost: null, turnaround: null },   pickup: true,  shopUrl: 'https://example.com/clover-hill' },
+    { id: 4, displayName: 'Joe Pacheco',    photo: null, bio: 'Keeps bees near buckwheat and clover fields.',          applicationStatus: 'approved', certification: 'pending', shipping: { ships: true,  cost: 6, turnaround: '1 week' },   pickup: true,  shopUrl: null },
+    { id: 5, displayName: 'Anne Whitfield', photo: null, bio: 'Basswood and goldenrod country, high in the hills.',     applicationStatus: 'approved', certification: 'certified', shipping: { ships: true,  cost: 9, turnaround: '3–5 days' }, pickup: false, shopUrl: 'https://example.com/green-mountain' },
+    { id: 6, displayName: 'Sam Okafor',     photo: null, bio: 'Moves hives with the citrus bloom each spring.',         applicationStatus: 'approved', certification: 'certified', shipping: { ships: true,  cost: 8, turnaround: '2–3 days' }, pickup: false, shopUrl: null }
   ],
 
   // precision: 'exact' shows the hive pin; 'approximate' only shows an area
@@ -67,16 +76,18 @@ const MOCK = {
   // texture: 'liquid', 'crystallized' or 'creamed' (only one; keepers update it if the honey crystallizes later)
   // flags: 'creamed', 'single-hive'
   batches: [
-    { id: 1,  batchNumber: '0001', hiveIds: [1, 2, 3], harvestDate: '2026-06-14', season: 'Spring 2026', quantityLb: 40,  honeyType: 'Wildflower', texture: 'liquid',     flowerTypes: ['Clover', 'Aster'],          flags: [],                       notes: '', traceUrl: 'product.html?id=1' },
-    { id: 2,  batchNumber: '0002', hiveIds: [1, 2],    harvestDate: '2026-09-02', season: 'Fall 2026',   quantityLb: 32,  honeyType: 'Goldenrod', texture: 'creamed',      flowerTypes: ['Goldenrod', 'Aster'],       flags: ['creamed'],              notes: '', traceUrl: 'product.html?id=2' },
-    { id: 3,  batchNumber: '0003', hiveIds: [4, 5],    harvestDate: '2026-05-28', season: 'Spring 2026', quantityLb: 55,  honeyType: 'Wildflower', texture: 'crystallized',     flowerTypes: ['Apple', 'Dandelion'],       flags: [],                       notes: '', traceUrl: 'product.html?id=3' },
-    { id: 4,  batchNumber: '0004', hiveIds: [4, 5],    harvestDate: '2026-07-20', season: 'Summer 2026', quantityLb: 48,  honeyType: 'Clover', texture: 'creamed',         flowerTypes: ['Clover'],                   flags: ['creamed'],              notes: '', traceUrl: 'product.html?id=4' },
-    { id: 5,  batchNumber: '0005', hiveIds: [6],       harvestDate: '2026-06-30', season: 'Summer 2026', quantityLb: 22,  honeyType: 'Wildflower', texture: 'liquid',     flowerTypes: ['Wildflowers', 'Black locust'], flags: ['single-hive'],       notes: '', traceUrl: 'product.html?id=5' },
-    { id: 6,  batchNumber: '0006', hiveIds: [7, 8],    harvestDate: '2026-08-25', season: 'Summer 2026', quantityLb: 60,  honeyType: 'Buckwheat', texture: 'crystallized',      flowerTypes: ['Buckwheat'],                flags: [],                       notes: '', traceUrl: 'product.html?id=6' },
-    { id: 7,  batchNumber: '0007', hiveIds: [9, 10],   harvestDate: '2026-07-12', season: 'Summer 2026', quantityLb: 70,  honeyType: 'Basswood', texture: 'liquid',       flowerTypes: ['Basswood'],                 flags: [],                       notes: '', traceUrl: 'product.html?id=7' },
-    { id: 8,  batchNumber: '0008', hiveIds: [9],       harvestDate: '2026-09-15', season: 'Fall 2026',   quantityLb: 18,  honeyType: 'Goldenrod', texture: 'creamed',      flowerTypes: ['Goldenrod', 'Fireweed'],    flags: ['single-hive', 'creamed'], notes: '', traceUrl: 'product.html?id=8' },
-    { id: 9,  batchNumber: '0009', hiveIds: [11],      harvestDate: '2026-04-10', season: 'Spring 2026', quantityLb: 90,  honeyType: 'Orange blossom', texture: 'liquid', flowerTypes: ['Orange blossom'],           flags: ['single-hive'],          notes: '', traceUrl: 'product.html?id=9' },
-    { id: 10, batchNumber: '0010', hiveIds: [7],       harvestDate: '2026-06-05', season: 'Spring 2026', quantityLb: 25,  honeyType: 'Clover', texture: 'liquid',         flowerTypes: ['Clover', 'Alfalfa'],        flags: ['single-hive'],          notes: '', traceUrl: 'product.html?id=10' }
+    { id: 1,  batchNumber: '0001', hiveIds: [1, 2, 3], harvestDate: '2026-06-14', season: 'Spring 2026', quantityLb: 40,  honeyType: 'Wildflower', texture: 'liquid',     flowerTypes: ['Clover', 'Aster'],          flags: [],                       notes: '', traceUrl: 'product.html?batch=1' },
+    { id: 2,  batchNumber: '0002', hiveIds: [1, 2],    harvestDate: '2026-09-02', season: 'Fall 2026',   quantityLb: 32,  honeyType: 'Goldenrod', texture: 'creamed',      flowerTypes: ['Goldenrod', 'Aster'],       flags: ['creamed'],              notes: '', traceUrl: 'product.html?batch=2' },
+    { id: 3,  batchNumber: '0003', hiveIds: [4, 5],    harvestDate: '2026-05-28', season: 'Spring 2026', quantityLb: 55,  honeyType: 'Wildflower', texture: 'crystallized',     flowerTypes: ['Apple', 'Dandelion'],       flags: [],                       notes: '', traceUrl: 'product.html?batch=3' },
+    { id: 4,  batchNumber: '0004', hiveIds: [4, 5],    harvestDate: '2026-07-20', season: 'Summer 2026', quantityLb: 48,  honeyType: 'Clover', texture: 'creamed',         flowerTypes: ['Clover'],                   flags: ['creamed'],              notes: '', traceUrl: 'product.html?batch=4' },
+    { id: 5,  batchNumber: '0005', hiveIds: [6],       harvestDate: '2026-06-30', season: 'Summer 2026', quantityLb: 22,  honeyType: 'Wildflower', texture: 'liquid',     flowerTypes: ['Wildflowers', 'Black locust'], flags: ['single-hive'],       notes: '', traceUrl: 'product.html?batch=5' },
+    { id: 6,  batchNumber: '0006', hiveIds: [7, 8],    harvestDate: '2026-08-25', season: 'Summer 2026', quantityLb: 60,  honeyType: 'Buckwheat', texture: 'crystallized',      flowerTypes: ['Buckwheat'],                flags: [],                       notes: '', traceUrl: 'product.html?batch=6' },
+    { id: 7,  batchNumber: '0007', hiveIds: [9, 10],   harvestDate: '2026-07-12', season: 'Summer 2026', quantityLb: 70,  honeyType: 'Basswood', texture: 'liquid',       flowerTypes: ['Basswood'],                 flags: [],                       notes: '', traceUrl: 'product.html?batch=7' },
+    { id: 8,  batchNumber: '0008', hiveIds: [9],       harvestDate: '2026-09-15', season: 'Fall 2026',   quantityLb: 18,  honeyType: 'Goldenrod', texture: 'creamed',      flowerTypes: ['Goldenrod', 'Fireweed'],    flags: ['single-hive', 'creamed'], notes: '', traceUrl: 'product.html?batch=8' },
+    { id: 9,  batchNumber: '0009', hiveIds: [11],      harvestDate: '2026-04-10', season: 'Spring 2026', quantityLb: 90,  honeyType: 'Orange blossom', texture: 'liquid', flowerTypes: ['Orange blossom'],           flags: ['single-hive'],          notes: '', traceUrl: 'product.html?batch=9' },
+    { id: 10, batchNumber: '0010', hiveIds: [7],       harvestDate: '2026-06-05', season: 'Spring 2026', quantityLb: 25,  honeyType: 'Clover', texture: 'liquid',         flowerTypes: ['Clover', 'Alfalfa'],        flags: ['single-hive'],          notes: '', traceUrl: 'product.html?batch=10' },
+    // Not listed on Honey Tracker: sold at a farmers market, but its QR label still traces here
+    { id: 11, batchNumber: '0011', hiveIds: [3],       harvestDate: '2026-09-20', season: 'Fall 2026',   quantityLb: 30,  honeyType: 'Goldenrod', texture: 'liquid',      flowerTypes: ['Goldenrod', 'Aster'],       flags: ['single-hive'],          notes: '', traceUrl: 'product.html?batch=11' }
   ],
 
   // Pollen profile per batch (percent adds up to 100). Product page pie chart.
@@ -90,14 +101,45 @@ const MOCK = {
     { batchId: 7,  flower: 'Basswood', percent: 80 }, { batchId: 7,  flower: 'Clover', percent: 20 },
     { batchId: 8,  flower: 'Goldenrod', percent: 65 }, { batchId: 8,  flower: 'Fireweed', percent: 35 },
     { batchId: 9,  flower: 'Orange blossom', percent: 95 }, { batchId: 9, flower: 'Saw palmetto', percent: 5 },
-    { batchId: 10, flower: 'Clover', percent: 60 }, { batchId: 10, flower: 'Alfalfa', percent: 40 }
+    { batchId: 10, flower: 'Clover', percent: 60 }, { batchId: 10, flower: 'Alfalfa', percent: 40 },
+    { batchId: 11, flower: 'Goldenrod', percent: 75 }, { batchId: 11, flower: 'Aster', percent: 25 }
   ],
 
   // Chain of custody. stage: 'bloom', 'harvest', 'jarred'
   timeline: [
-    { batchId: 1, date: '2026-04-20', stage: 'bloom',   location: 'Jefferson County, OH' },
-    { batchId: 1, date: '2026-06-14', stage: 'harvest', location: 'Jefferson County, OH' },
-    { batchId: 1, date: '2026-06-21', stage: 'jarred',  location: 'Jefferson County, OH' }
+    { batchId: 1,  date: '2026-04-20', stage: 'bloom',   location: 'Jefferson County, OH' },
+    { batchId: 1,  date: '2026-06-14', stage: 'harvest', location: 'Jefferson County, OH' },
+    { batchId: 1,  date: '2026-06-21', stage: 'jarred',  location: 'Jefferson County, OH' },
+    { batchId: 2,  date: '2026-08-10', stage: 'bloom',   location: 'Jefferson County, OH' },
+    { batchId: 2,  date: '2026-09-02', stage: 'harvest', location: 'Jefferson County, OH' },
+    { batchId: 2,  date: '2026-09-16', stage: 'jarred',  location: 'Jefferson County, OH' },
+    { batchId: 3,  date: '2026-04-15', stage: 'bloom',   location: 'Washington County, PA' },
+    { batchId: 3,  date: '2026-05-28', stage: 'harvest', location: 'Washington County, PA' },
+    { batchId: 3,  date: '2026-06-04', stage: 'jarred',  location: 'Washington County, PA' },
+    { batchId: 4,  date: '2026-06-01', stage: 'bloom',   location: 'Washington County, PA' },
+    { batchId: 4,  date: '2026-07-20', stage: 'harvest', location: 'Washington County, PA' },
+    { batchId: 4,  date: '2026-08-03', stage: 'jarred',  location: 'Washington County, PA' },
+    { batchId: 5,  date: '2026-05-10', stage: 'bloom',   location: 'Ohio County, WV' },
+    { batchId: 5,  date: '2026-06-30', stage: 'harvest', location: 'Ohio County, WV' },
+    { batchId: 5,  date: '2026-07-06', stage: 'jarred',  location: 'Ohio County, WV' },
+    { batchId: 6,  date: '2026-07-15', stage: 'bloom',   location: 'Holmes County, OH' },
+    { batchId: 6,  date: '2026-08-25', stage: 'harvest', location: 'Holmes County, OH' },
+    { batchId: 6,  date: '2026-09-01', stage: 'jarred',  location: 'Holmes County, OH' },
+    { batchId: 7,  date: '2026-06-20', stage: 'bloom',   location: 'Addison County, VT' },
+    { batchId: 7,  date: '2026-07-12', stage: 'harvest', location: 'Addison County, VT' },
+    { batchId: 7,  date: '2026-07-19', stage: 'jarred',  location: 'Addison County, VT' },
+    { batchId: 8,  date: '2026-08-15', stage: 'bloom',   location: 'Addison County, VT' },
+    { batchId: 8,  date: '2026-09-15', stage: 'harvest', location: 'Addison County, VT' },
+    { batchId: 8,  date: '2026-09-29', stage: 'jarred',  location: 'Addison County, VT' },
+    { batchId: 9,  date: '2026-03-01', stage: 'bloom',   location: 'Lake County, FL' },
+    { batchId: 9,  date: '2026-04-10', stage: 'harvest', location: 'Lake County, FL' },
+    { batchId: 9,  date: '2026-04-15', stage: 'jarred',  location: 'Lake County, FL' },
+    { batchId: 10, date: '2026-05-01', stage: 'bloom',   location: 'Holmes County, OH' },
+    { batchId: 10, date: '2026-06-05', stage: 'harvest', location: 'Holmes County, OH' },
+    { batchId: 10, date: '2026-06-12', stage: 'jarred',  location: 'Holmes County, OH' },
+    { batchId: 11, date: '2026-08-20', stage: 'bloom',   location: 'Jefferson County, OH' },
+    { batchId: 11, date: '2026-09-20', stage: 'harvest', location: 'Jefferson County, OH' },
+    { batchId: 11, date: '2026-09-27', stage: 'jarred',  location: 'Jefferson County, OH' }
   ],
 
   // badges: 'certified', 'raw', 'pure', 'creamed', 'single-hive', 'volunteer-verified'
@@ -163,8 +205,56 @@ async function getListing(id) {
     practices: MOCK.practices.find(p => p.farmId === farm.id) || null,
     nearbyFlowers: MOCK.nearbyFlowers.find(f => f.farmId === farm.id) || null,
     pollen: MOCK.pollen.filter(p => p.batchId === batch.id),
+    timeline: MOCK.timeline.filter(t => t.batchId === batch.id),
+    listing: true
+  };
+}
+
+// One batch's trace (product page via a QR label: product.html?batch=11).
+// listing is null when the honey isn't sold on Honey Tracker (e.g. a farmers-market jar).
+async function getTrace(batchId) {
+  const batch = byId(MOCK.batches, batchId);
+  if (!batch) return null;
+  const listing = MOCK.listings.find(l => l.batchId === batch.id);
+  if (listing) return { ...(await getListing(listing.id)), listing: true };
+  const hives = batch.hiveIds.map(hiveId => byId(MOCK.hives, hiveId));
+  const farm = byId(MOCK.farms, hives[0].farmId);
+  return {
+    title: `${batch.honeyType} Honey`,
+    listing: false,
+    farmId: farm.id,
+    farmName: farm.name,
+    state: farm.state,
+    season: batch.season,
+    harvestDate: batch.harvestDate,
+    // No listing, so badges come from what we know about the farm and the batch
+    badges: [
+      farm.certified ? 'certified' : null,
+      ...batch.flags,
+      farm.verification === 'volunteer' ? 'volunteer-verified' : null
+    ].filter(Boolean),
+    batch,
+    hives,
+    farm,
+    keeper: byId(MOCK.keepers, farm.keeperId),
+    practices: MOCK.practices.find(p => p.farmId === farm.id) || null,
+    nearbyFlowers: MOCK.nearbyFlowers.find(f => f.farmId === farm.id) || null,
+    pollen: MOCK.pollen.filter(p => p.batchId === batch.id),
     timeline: MOCK.timeline.filter(t => t.batchId === batch.id)
   };
+}
+
+// Every farm for the maps: keeper, hives, and the honey it sells here.
+// The backend's GET /farms should return roughly this shape. Approximate farms
+// must arrive with rounded coordinates (lat/lng) and no hive coordinates.
+async function getFarms() {
+  const listings = MOCK.listings.map(listingView);
+  return MOCK.farms.map(farm => ({
+    ...farm,
+    keeper: byId(MOCK.keepers, farm.keeperId),
+    hives: MOCK.hives.filter(h => h.farmId === farm.id),
+    listings: listings.filter(l => l.farmId === farm.id)
+  }));
 }
 
 // One farm with its hives (map popup, product hover card).

@@ -9,54 +9,21 @@ $liquid-gold:  #C98A12;  // Liquid icon
 }
 
 .learn-title {
-  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-size: 1.75rem; // smaller than the page's "Learn" title, so that one leads
   margin-bottom: .25rem;
 }
 
-// ---- Side tabs: a white panel on desktop, a scrollable row of pills on smaller screens ----
-.learn-tabs {
-  .nav {
-    gap: .4rem;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: .25rem; // room for the scrollbar on touch devices
-  }
+// ---- Title on the left, tabs on the right (tabs drop under the title on smaller screens) ----
+// The tabs themselves are .seg-tabs (components/_seg-tabs.scss).
+.learn-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  margin-bottom: 2rem;
 
-  .nav-link {
-    color: $ink-soft;
-    font-weight: 600;
-    white-space: nowrap;
-    border-radius: 999px;
-    background: #fff;
-    border: 1px solid $line;
-    padding: .55rem 1rem;
-
-    &:hover { color: $ink; }
-
-    &.active {
-      background: $amber;
-      border-color: $amber;
-      color: $ink;
-    }
-  }
-
-  @include media-breakpoint-up(lg) {
-    position: sticky;
-    top: 1.5rem;
-    background: #fff;
-    border: 1px solid $line;
-    border-radius: 1rem;
-    padding: .75rem;
-
-    .nav { overflow: visible; padding-bottom: 0; }
-
-    .nav-link {
-      text-align: left;
-      border: 0;
-      border-radius: .6rem;
-      padding: .7rem .95rem;
-    }
-  }
+  .page-head { margin-bottom: 0; }
 }
 
 // ---- Label tiles ----

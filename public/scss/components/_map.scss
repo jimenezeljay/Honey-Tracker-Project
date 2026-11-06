@@ -61,3 +61,38 @@
   .key-pin { width: .75rem; height: .75rem; border-radius: 50%; background: $amber; }
   .key-area { width: 1rem; height: 1rem; border-radius: 50%; background: rgba($amber, .18); border: 2px dashed $amber; }
 }
+
+// ---- Real maps (Leaflet + OpenStreetMap), built by js/maps.js ----
+.ht-map {
+  font-family: $font-family-sans-serif;
+  background: #E2E6DE; // shows while tiles load
+
+  // Leaflet's own controls in site colors
+  .leaflet-control-zoom a { color: $ink; }
+  .leaflet-control-attribution { font-size: .7rem; }
+  .leaflet-control-attribution a { color: $amber-deep; }
+
+  .leaflet-tooltip { font-weight: 600; color: $ink; }
+}
+
+// Exact hive pin (same look as the old placeholder .map-pin)
+.ht-pin {
+  border-radius: 50%;
+  background: $amber;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 4px rgba($ink, .35);
+}
+
+// Approximate farm, zoomed out: dashed ring (same look as the legend's key-area)
+.ht-area {
+  border-radius: 50%;
+  background: rgba($amber, .18);
+  border: 2px dashed $amber;
+}
+
+// Keyboard focus on a pin
+.leaflet-marker-icon.ht-pin:focus-visible,
+.leaflet-marker-icon.ht-area:focus-visible {
+  outline: 3px solid $ink;
+  outline-offset: 2px;
+}
