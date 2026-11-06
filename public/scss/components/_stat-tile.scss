@@ -1,0 +1,45 @@
+// A number with a label, e.g. the dashboard's Farms / Hives / Harvests / Listings counts.
+// Built by statTile(label, value, icon) in js/components.js.
+.stat-tile {
+  @extend .panel;
+  padding: 1.1rem 1.25rem;
+  height: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "icon value"
+    "icon label";
+  column-gap: .9rem;
+  align-items: center;
+}
+
+.stat-tile__icon {
+  grid-area: icon;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: .75rem;
+  background: rgba($amber, .2);
+  color: $amber-deep;
+  display: grid;
+  place-items: center;
+}
+
+.stat-tile__svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.stat-tile__value {
+  grid-area: value;
+  font-family: $headings-font-family;
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stat-tile__label {
+  grid-area: label;
+  color: $ink-soft;
+  font-weight: 600;
+  font-size: .9rem;
+}

@@ -1,0 +1,57 @@
+// Beekeeper pages: menu column + content. The menu comes from keeperSidebar() in js/components.js.
+//   <div class="container keeper-layout">
+//     <div data-component="keeper-sidebar" data-active="dashboard"></div>
+//     <main class="keeper-main">...</main>
+//   </div>
+.keeper-layout {
+  padding-block: 2rem 1rem;
+}
+
+@include media-breakpoint-up(lg) {
+  .keeper-layout {
+    display: grid;
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: 2.5rem;
+
+    // The hat icon hides the menu column
+    &.menu-hidden {
+      grid-template-columns: minmax(0, 1fr);
+
+      [data-component="keeper-sidebar"] { display: none; }
+    }
+  }
+
+  // The menu stays in view while the content scrolls
+  .keeper-sidebar {
+    position: sticky;
+    top: 1.5rem;
+  }
+}
+
+.keeper-sidebar {
+  --bs-offcanvas-width: 18rem; // phone drawer width
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .6rem .8rem;
+    border-radius: .6rem;
+    color: $ink-soft;
+    font-weight: 600;
+
+    &:hover { color: $ink; background: rgba($sage, .15); }
+
+    &.active {
+      color: $ink;
+      background: rgba($amber, .2);
+      box-shadow: inset 3px 0 0 $amber;
+    }
+  }
+}
+
+// The hat in the top bar
+.keeper-hat svg {
+  width: 1.35rem;
+  height: 1.35rem;
+}
