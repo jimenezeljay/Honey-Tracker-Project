@@ -235,32 +235,6 @@
     window.location.href = 'cart.html';
   }
 
-  // ---- TEMPORARY: Wide / Narrow switch (bottom right, desktop only) ----
-  // Lets the team compare the two widths. Remembered in this browser; ?layout=narrow also works.
-  // Delete this block, the .layout-switch markup and its styles once one is picked.
-  const LAYOUT_KEY = 'ht-trace-layout';
-
-  function setLayout(layout) {
-    page.classList.toggle('trace--narrow', layout === 'narrow');
-    document.querySelectorAll('.layout-switch [data-layout]').forEach(button => {
-      const on = button.dataset.layout === layout;
-      button.classList.toggle('active', on);
-      button.setAttribute('aria-pressed', String(on));
-    });
-    try { localStorage.setItem(LAYOUT_KEY, layout); } catch (error) { /* storage blocked */ }
-  }
-
-  function initLayoutSwitch() {
-    let saved = new URLSearchParams(window.location.search).get('layout');
-    if (!saved) { try { saved = localStorage.getItem(LAYOUT_KEY); } catch (error) { saved = null; } }
-    setLayout(saved === 'narrow' ? 'narrow' : 'wide');
-    document.querySelectorAll('.layout-switch [data-layout]').forEach(button => {
-      button.addEventListener('click', () => setLayout(button.dataset.layout));
-    });
-  }
-
-  initLayoutSwitch();
-
   // ---- Load ----
 
   async function load() {

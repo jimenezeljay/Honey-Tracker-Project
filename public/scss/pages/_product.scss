@@ -325,31 +325,9 @@
   @include media-breakpoint-up(lg) { margin-top: 2rem; }
 }
 
-// TEMPORARY: the narrower option, switched by .layout-switch. Remove once one is picked.
+// Narrower page on desktop so the photo, buy box and trace read as one block
 @include media-breakpoint-up(lg) {
-  .container.trace--narrow { max-width: 960px; }
-}
-
-.layout-switch {
-  position: fixed;
-  right: 1rem;
-  bottom: 1rem;
-  z-index: $zindex-fixed;
-  gap: .25rem;
-  padding: .25rem;
-  background: #fff;
-  border: 1px solid $line;
-  border-radius: 999px;
-  box-shadow: 0 2px 10px rgba($ink, .12);
-
-  .btn {
-    border-radius: 999px;
-    font-weight: 600;
-    color: $ink-soft;
-    padding-inline: .9rem;
-
-    &.active { background: $amber; color: $ink; }
-  }
+  .container.trace { max-width: 960px; }
 }
 
 .trace-buy {
