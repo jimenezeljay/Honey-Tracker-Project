@@ -13,6 +13,12 @@
 // It's unused until the helpers switch to fetch(); then only this line changes per server.
 const API_BASE = '';
 
+// Site address for QR labels. Every QR code is SITE_URL + a batch's relative traceUrl
+// (see qrLink below), so this is the only line to change when the site moves to
+// Mr. Gallic's server and its own domain. Until then labels point at GitHub Pages:
+// fine for testing, but no real labels get handed out before the domain is live.
+const SITE_URL = 'https://jimenezeljay.github.io/Honey-Tracker-Project/';
+
 // Every name, farm and number here is invented sample data.
 // Units match the wireframes: prices in USD, harvests in lb, jars in oz.
 
@@ -26,7 +32,9 @@ const MOCK = {
     { id: 3, displayName: 'Mara Lindqvist', photo: null, bio: 'Small apiary beside a wildflower meadow restoration.',   applicationStatus: 'approved', certification: 'certified', shipping: { ships: false, cost: null, turnaround: null },   pickup: true,  shopUrl: 'https://example.com/clover-hill' },
     { id: 4, displayName: 'Joe Pacheco',    photo: null, bio: 'Keeps bees near buckwheat and clover fields.',          applicationStatus: 'approved', certification: 'pending', shipping: { ships: true,  cost: 6, turnaround: '1 week' },   pickup: true,  shopUrl: null },
     { id: 5, displayName: 'Anne Whitfield', photo: null, bio: 'Basswood and goldenrod country, high in the hills.',     applicationStatus: 'approved', certification: 'certified', shipping: { ships: true,  cost: 9, turnaround: '3–5 days' }, pickup: false, shopUrl: 'https://example.com/green-mountain' },
-    { id: 6, displayName: 'Sam Okafor',     photo: null, bio: 'Moves hives with the citrus bloom each spring.',         applicationStatus: 'approved', certification: 'certified', shipping: { ships: true,  cost: 8, turnaround: '2–3 days' }, pickup: false, shopUrl: null }
+    { id: 6, displayName: 'Sam Okafor',     photo: null, bio: 'Moves hives with the citrus bloom each spring.',         applicationStatus: 'approved', certification: 'certified', shipping: { ships: true,  cost: 8, turnaround: '2–3 days' }, pickup: false, shopUrl: null },
+    // Suspended, for testing: product.html?batch=12 opens but can't be bought, and the listing is hidden
+    { id: 7, displayName: 'Lena Brandt',    photo: null, bio: 'Keeps a dozen hives along a creek bottom.',             applicationStatus: 'approved', certification: 'suspended', shipping: { ships: true,  cost: 6, turnaround: '2–3 days' }, pickup: true,  shopUrl: 'https://example.com/hollow-creek' }
   ],
 
   // precision: 'exact' shows the hive pin; 'approximate' only shows an area
@@ -38,7 +46,8 @@ const MOCK = {
     { id: 3, keeperId: 3, name: 'Clover Hill',        description: 'Beside a restored wildflower meadow.',   photo: null, county: 'Ohio',       state: 'WV', lat: 40.06,  lng: -80.69,  precision: 'exact',       verification: 'volunteer',     certified: true },
     { id: 4, keeperId: 4, name: 'Buckeye Bee Co.',    description: 'Buckwheat and clover fields all summer.', photo: null, county: 'Holmes',     state: 'OH', lat: 40.6,   lng: -81.9,   precision: 'approximate', verification: 'self-reported', certified: false },
     { id: 5, keeperId: 5, name: 'Green Mountain Hives', description: 'Basswood forest and late goldenrod.',  photo: null, county: 'Addison',    state: 'VT', lat: 44.01,  lng: -73.17,  precision: 'exact',       verification: 'volunteer',     certified: true },
-    { id: 6, keeperId: 6, name: 'Citrus Grove Apiary', description: 'Orange blossom honey from grove hives.', photo: null, county: 'Lake',       state: 'FL', lat: 28.8,   lng: -81.7,   precision: 'approximate', verification: 'self-reported', certified: true }
+    { id: 6, keeperId: 6, name: 'Citrus Grove Apiary', description: 'Orange blossom honey from grove hives.', photo: null, county: 'Lake',       state: 'FL', lat: 28.8,   lng: -81.7,   precision: 'approximate', verification: 'self-reported', certified: true },
+    { id: 7, keeperId: 7, name: 'Hollow Creek Apiary', description: 'Creek-bottom hives under the sycamores.', photo: null, county: 'Belmont',    state: 'OH', lat: 40.03,  lng: -80.97,  precision: 'exact',       verification: 'volunteer',     certified: true }
   ],
 
   hives: [
@@ -52,7 +61,8 @@ const MOCK = {
     { id: 8,  farmId: 4, label: 'H2', lat: 40.6,   lng: -81.9,   forageRadiusMi: 3, beeType: 'Italian' },
     { id: 9,  farmId: 5, label: 'H1', lat: 44.012, lng: -73.171, forageRadiusMi: 2, beeType: 'Carniolan' },
     { id: 10, farmId: 5, label: 'H2', lat: 44.009, lng: -73.165, forageRadiusMi: 2, beeType: 'Carniolan' },
-    { id: 11, farmId: 6, label: 'H1', lat: 28.8,   lng: -81.7,   forageRadiusMi: 3, beeType: 'Italian' }
+    { id: 11, farmId: 6, label: 'H1', lat: 28.8,   lng: -81.7,   forageRadiusMi: 3, beeType: 'Italian' },
+    { id: 12, farmId: 7, label: 'H1', lat: 40.031, lng: -80.968, forageRadiusMi: 2, beeType: 'Italian' }
   ],
 
   practices: [
@@ -61,7 +71,8 @@ const MOCK = {
     { farmId: 3, feedingNotes: 'No feeding.', pestNotes: 'Drone-brood removal for mites.' },
     { farmId: 4, feedingNotes: 'Spring pollen patties.', pestNotes: 'Formic acid pads in late summer.' },
     { farmId: 5, feedingNotes: 'No feeding.', pestNotes: 'Oxalic acid in winter broodless period.' },
-    { farmId: 6, feedingNotes: 'Sugar syrup between blooms.', pestNotes: 'Thymol treatment in fall.' }
+    { farmId: 6, feedingNotes: 'Sugar syrup between blooms.', pestNotes: 'Thymol treatment in fall.' },
+    { farmId: 7, feedingNotes: 'No feeding during honey flow.', pestNotes: 'Oxalic acid in late fall.' }
   ],
 
   nearbyFlowers: [
@@ -70,7 +81,8 @@ const MOCK = {
     { farmId: 3, flowers: ['Wildflowers', 'Clover', 'Black locust'], pesticideNotes: 'None reported.' },
     { farmId: 4, flowers: ['Buckwheat', 'Clover', 'Alfalfa'],      pesticideNotes: 'Field crops nearby; keeper tracks spray dates.' },
     { farmId: 5, flowers: ['Basswood', 'Goldenrod', 'Fireweed'],   pesticideNotes: 'None reported.' },
-    { farmId: 6, flowers: ['Orange blossom', 'Saw palmetto'],      pesticideNotes: 'Grove spray schedule shared with keeper.' }
+    { farmId: 6, flowers: ['Orange blossom', 'Saw palmetto'],      pesticideNotes: 'Grove spray schedule shared with keeper.' },
+    { farmId: 7, flowers: ['Clover', 'Sumac', 'Wild raspberry'],   pesticideNotes: 'None reported.' }
   ],
 
   // texture: 'liquid', 'crystallized' or 'creamed' (only one; keepers update it if the honey crystallizes later)
@@ -87,7 +99,9 @@ const MOCK = {
     { id: 9,  batchNumber: '0009', hiveIds: [11],      harvestDate: '2026-04-10', season: 'Spring 2026', quantityLb: 90,  honeyType: 'Orange blossom', texture: 'liquid', flowerTypes: ['Orange blossom'],           flags: ['single-hive'],          notes: '', traceUrl: 'product.html?batch=9' },
     { id: 10, batchNumber: '0010', hiveIds: [7],       harvestDate: '2026-06-05', season: 'Spring 2026', quantityLb: 25,  honeyType: 'Clover', texture: 'liquid',         flowerTypes: ['Clover', 'Alfalfa'],        flags: ['single-hive'],          notes: '', traceUrl: 'product.html?batch=10' },
     // Not listed on Honey Tracker: sold at a farmers market, but its QR label still traces here
-    { id: 11, batchNumber: '0011', hiveIds: [3],       harvestDate: '2026-09-20', season: 'Fall 2026',   quantityLb: 30,  honeyType: 'Goldenrod', texture: 'liquid',      flowerTypes: ['Goldenrod', 'Aster'],       flags: ['single-hive'],          notes: '', traceUrl: 'product.html?batch=11' }
+    { id: 11, batchNumber: '0011', hiveIds: [3],       harvestDate: '2026-09-20', season: 'Fall 2026',   quantityLb: 30,  honeyType: 'Goldenrod', texture: 'liquid',      flowerTypes: ['Goldenrod', 'Aster'],       flags: ['single-hive'],          notes: '', traceUrl: 'product.html?batch=11' },
+    // From the suspended keeper (keeper 7)
+    { id: 12, batchNumber: '0001', hiveIds: [12],      harvestDate: '2026-07-08', season: 'Summer 2026', quantityLb: 35,  honeyType: 'Wildflower', texture: 'liquid',     flowerTypes: ['Clover', 'Sumac'],          flags: ['single-hive'],          notes: '', traceUrl: 'product.html?batch=12' }
   ],
 
   // Pollen profile per batch (percent adds up to 100). Product page pie chart.
@@ -102,7 +116,8 @@ const MOCK = {
     { batchId: 8,  flower: 'Goldenrod', percent: 65 }, { batchId: 8,  flower: 'Fireweed', percent: 35 },
     { batchId: 9,  flower: 'Orange blossom', percent: 95 }, { batchId: 9, flower: 'Saw palmetto', percent: 5 },
     { batchId: 10, flower: 'Clover', percent: 60 }, { batchId: 10, flower: 'Alfalfa', percent: 40 },
-    { batchId: 11, flower: 'Goldenrod', percent: 75 }, { batchId: 11, flower: 'Aster', percent: 25 }
+    { batchId: 11, flower: 'Goldenrod', percent: 75 }, { batchId: 11, flower: 'Aster', percent: 25 },
+    { batchId: 12, flower: 'Clover', percent: 55 }, { batchId: 12, flower: 'Sumac', percent: 30 }, { batchId: 12, flower: 'Wild raspberry', percent: 15 }
   ],
 
   // Chain of custody. stage: 'bloom', 'harvest', 'jarred'
@@ -139,7 +154,10 @@ const MOCK = {
     { batchId: 10, date: '2026-06-12', stage: 'jarred',  location: 'Holmes County, OH' },
     { batchId: 11, date: '2026-08-20', stage: 'bloom',   location: 'Jefferson County, OH' },
     { batchId: 11, date: '2026-09-20', stage: 'harvest', location: 'Jefferson County, OH' },
-    { batchId: 11, date: '2026-09-27', stage: 'jarred',  location: 'Jefferson County, OH' }
+    { batchId: 11, date: '2026-09-27', stage: 'jarred',  location: 'Jefferson County, OH' },
+    { batchId: 12, date: '2026-05-20', stage: 'bloom',   location: 'Belmont County, OH' },
+    { batchId: 12, date: '2026-07-08', stage: 'harvest', location: 'Belmont County, OH' },
+    { batchId: 12, date: '2026-07-15', stage: 'jarred',  location: 'Belmont County, OH' }
   ],
 
   // badges: 'certified', 'raw', 'pure', 'creamed', 'single-hive', 'volunteer-verified'
@@ -153,12 +171,28 @@ const MOCK = {
     { id: 7,  batchId: 7,  title: 'Basswood Honey',       photo: null, price: 15,   jarOz: 12, stock: 22, badges: ['certified', 'raw', 'pure', 'volunteer-verified'] },
     { id: 8,  batchId: 8,  title: 'Single-Hive Goldenrod', photo: null, price: 20,  jarOz: 8,  stock: 4,  badges: ['certified', 'single-hive', 'creamed', 'volunteer-verified'] },
     { id: 9,  batchId: 9,  title: 'Orange Blossom Honey', photo: null, price: 17,   jarOz: 16, stock: 35, badges: ['certified', 'pure', 'single-hive'] },
-    { id: 10, batchId: 10, title: 'Clover Honey',         photo: null, price: 9.5,  jarOz: 12, stock: 0,  badges: ['raw', 'single-hive'] }
+    { id: 10, batchId: 10, title: 'Clover Honey',         photo: null, price: 9.5,  jarOz: 12, stock: 0,  badges: ['raw', 'single-hive'] },
+    // Suspended keeper: hidden from the Marketplace and maps, still reachable by its QR (batch 12)
+    { id: 11, batchId: 12, title: 'Creek Bottom Wildflower', photo: null, price: 13, jarOz: 12, stock: 15, badges: ['certified', 'raw', 'single-hive', 'volunteer-verified'] }
   ]
 };
 
 // ---- Lookups (internal) ----
 const byId = (list, id) => list.find(item => item.id === Number(id));
+
+// Suspended keepers (see "QR labels -> Suspended keepers" in the API contract).
+// The API does these, so the pages get them for free:
+//   - their honey isn't listed (Marketplace, maps), but its trace page still opens
+//   - 'certified' is left out of their badges, and their farm isn't marked certified
+const keeperOfListing = listing => {
+  const batch = byId(MOCK.batches, listing.batchId);
+  const farm = byId(MOCK.farms, byId(MOCK.hives, batch.hiveIds[0]).farmId);
+  return byId(MOCK.keepers, farm.keeperId);
+};
+const isSuspended = keeper => keeper?.certification === 'suspended';
+const forSale = listing => !isSuspended(keeperOfListing(listing));
+const uncertifyIfSuspended = (badges, keeper) =>
+  isSuspended(keeper) ? badges.filter(badge => badge !== 'certified') : badges;
 
 // One flat object per listing with everything a card or filter needs.
 // The backend's GET /listings should return roughly this shape.
@@ -186,7 +220,7 @@ function listingView(listing) {
 // All listings, flattened. Filtering and sorting happen in the page for now;
 // later the page can pass them to GET /listings?type=&badges=&state=&min=&max=&season=&sort=
 async function getListings() {
-  return MOCK.listings.map(listingView);
+  return MOCK.listings.filter(forSale).map(listingView);
 }
 
 // One listing with its batch, farm, keeper, hives, pollen and timeline (product page).
@@ -196,12 +230,14 @@ async function getListing(id) {
   const batch = byId(MOCK.batches, listing.batchId);
   const hives = batch.hiveIds.map(hiveId => byId(MOCK.hives, hiveId));
   const farm = byId(MOCK.farms, hives[0].farmId);
+  const keeper = byId(MOCK.keepers, farm.keeperId);
   return {
     ...listingView(listing),
+    badges: uncertifyIfSuspended(listing.badges, keeper),
     batch,
     hives,
-    farm,
-    keeper: byId(MOCK.keepers, farm.keeperId),
+    farm: { ...farm, certified: farm.certified && !isSuspended(keeper) },
+    keeper,
     practices: MOCK.practices.find(p => p.farmId === farm.id) || null,
     nearbyFlowers: MOCK.nearbyFlowers.find(f => f.farmId === farm.id) || null,
     pollen: MOCK.pollen.filter(p => p.batchId === batch.id),
@@ -219,6 +255,7 @@ async function getTrace(batchId) {
   if (listing) return { ...(await getListing(listing.id)), listing: true };
   const hives = batch.hiveIds.map(hiveId => byId(MOCK.hives, hiveId));
   const farm = byId(MOCK.farms, hives[0].farmId);
+  const keeper = byId(MOCK.keepers, farm.keeperId);
   return {
     title: `${batch.honeyType} Honey`,
     listing: false,
@@ -228,15 +265,15 @@ async function getTrace(batchId) {
     season: batch.season,
     harvestDate: batch.harvestDate,
     // No listing, so badges come from what we know about the farm and the batch
-    badges: [
+    badges: uncertifyIfSuspended([
       farm.certified ? 'certified' : null,
       ...batch.flags,
       farm.verification === 'volunteer' ? 'volunteer-verified' : null
-    ].filter(Boolean),
+    ].filter(Boolean), keeper),
     batch,
     hives,
-    farm,
-    keeper: byId(MOCK.keepers, farm.keeperId),
+    farm: { ...farm, certified: farm.certified && !isSuspended(keeper) },
+    keeper,
     practices: MOCK.practices.find(p => p.farmId === farm.id) || null,
     nearbyFlowers: MOCK.nearbyFlowers.find(f => f.farmId === farm.id) || null,
     pollen: MOCK.pollen.filter(p => p.batchId === batch.id),
@@ -248,9 +285,10 @@ async function getTrace(batchId) {
 // The backend's GET /farms should return roughly this shape. Approximate farms
 // must arrive with rounded coordinates (lat/lng) and no hive coordinates.
 async function getFarms() {
-  const listings = MOCK.listings.map(listingView);
+  const listings = MOCK.listings.filter(forSale).map(listingView);
   return MOCK.farms.map(farm => ({
     ...farm,
+    certified: farm.certified && !isSuspended(byId(MOCK.keepers, farm.keeperId)),
     keeper: byId(MOCK.keepers, farm.keeperId),
     hives: MOCK.hives.filter(h => h.farmId === farm.id),
     listings: listings.filter(l => l.farmId === farm.id)
@@ -261,9 +299,11 @@ async function getFarms() {
 async function getFarm(id) {
   const farm = byId(MOCK.farms, id);
   if (!farm) return null;
+  const keeper = byId(MOCK.keepers, farm.keeperId);
   return {
     ...farm,
-    keeper: byId(MOCK.keepers, farm.keeperId),
+    certified: farm.certified && !isSuspended(keeper),
+    keeper,
     hives: MOCK.hives.filter(h => h.farmId === farm.id)
   };
 }
@@ -307,4 +347,18 @@ async function getKeeperDashboard() {
 // The backend's GET /applications/keeper returns this.
 async function getKeeperApplication() {
   return { status: mockState() || 'under-review' };
+}
+
+// ---- QR labels ----
+
+// The full link a jar's QR code holds: qrLink(batch) -> 'https://.../product.html?batch=11'
+function qrLink(batch) {
+  const base = SITE_URL.endsWith('/') ? SITE_URL : `${SITE_URL}/`;
+  return new URL(batch.traceUrl, base).href;
+}
+
+// The code printed under the QR for people who can't scan: batchCode(batch) -> 'HT-0011'.
+// Always the site-wide batch id, never the keeper's own batchNumber (two keepers can both have "0001").
+function batchCode(batch) {
+  return `HT-${String(batch.id).padStart(4, '0')}`;
 }
