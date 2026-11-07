@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QR label · Honey Tracker</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Compiled CSS (already includes Bootstrap) -->
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <!-- Navbar and footer are built by js/components.js (edit them there, once) -->
+  <div data-component="site-nav" data-role="keeper"></div>
+
+  <!-- QR label (wireframe 16). DRAFT: one label on plain paper for now.
+       Opened from the dashboard's "QR label" buttons as qr-label.html?batch=1.
+       The QR holds SITE_URL + the batch's traceUrl (js/data.js), so it opens the public trace page.
+       Stays hidden until js/qr-label.js has confirmed an approved keeper. -->
+  <div class="container keeper-layout" id="keeperPage" hidden>
+    <div data-component="keeper-sidebar" data-active="harvest"></div>
+
+    <main class="keeper-main">
+      <h1 class="mb-4">QR label</h1>
+
+      <!-- Suspended keepers can't make labels (the server refuses too) -->
+      <div class="alert alert-warning" id="suspendedNotice" role="alert" hidden>
+        Labels are paused while your certification is under review.
+      </div>
+
+      <div class="row g-4 align-items-start" id="labelArea">
+        <!-- The label itself. This is the only thing that prints. -->
+        <div class="col-md-6 col-xl-5">
+          <div class="qr-label" id="qrLabel" aria-label="Label preview">
+            <p class="qr-label__farm" data-fill="farm"></p>
+            <div class="qr-label__code" data-fill="qr"></div>
+            <p class="qr-label__scan">Scan to trace this honey</p>
+            <p class="qr-label__id" data-fill="code"></p>
+            <p class="qr-label__honey" data-fill="honey"></p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-xl-5">
+          <div class="panel qr-actions">
+            <label class="form-label fw-semibold" for="batchPick">Batch</label>
+            <select class="form-select mb-3" id="batchPick"></select>
+
+            <button class="btn btn-primary w-100 mb-2" type="button" id="printLabel">
+              <i class="bi bi-printer" aria-hidden="true"></i> Print label
+            </button>
+            <button class="btn btn-outline-secondary w-100" type="button" id="copyLink">
+              <i class="bi bi-link-45deg" aria-hidden="true"></i> <span>Copy trace link</span>
+            </button>
+
+            <p class="qr-actions__note">Print at 100% (Actual size). The code opens this batch's public trace page.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div data-component="site-footer"></div>
+
+  <!-- Shared navbar + footer first (local file, so they appear without waiting on the CDN) -->
+  <script src="js/components.js"></script>
+  <!-- Bootstrap JS (dropdowns, tabs, offcanvas, modals). Goes at the end of body -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Your JS -->
+  <script src="js/main.js"></script>
+  <!-- QR code generator (Kazuhiko Arase, MIT). Draws the code in the browser; no server or paid service -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@2.0.4/dist/qrcode.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/qr-label.js"></script>
+</body>
+</html>
