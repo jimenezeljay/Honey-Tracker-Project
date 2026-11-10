@@ -37,6 +37,7 @@
           <span class="seg-tabs__thumb" aria-hidden="true"></span>
           <button class="nav-link active" id="btn-definitions" data-bs-toggle="pill" data-bs-target="#tab-definitions" type="button" role="tab" aria-controls="tab-definitions" aria-selected="true"><span class="d-none d-sm-inline">Honey definitions</span><span class="d-sm-none">Definitions</span></button>
           <button class="nav-link" id="btn-purity" data-bs-toggle="pill" data-bs-target="#tab-purity" type="button" role="tab" aria-controls="tab-purity" aria-selected="false"><span class="d-none d-sm-inline">Why purity matters</span><span class="d-sm-none">Purity</span></button>
+          <button class="nav-link" id="btn-qr-tracing" data-bs-toggle="pill" data-bs-target="#tab-qr-tracing" type="button" role="tab" aria-controls="tab-qr-tracing" aria-selected="false"><span class="d-none d-sm-inline">QR tracing</span><span class="d-sm-none">QR</span></button>
           <button class="nav-link" id="btn-deeper" data-bs-toggle="pill" data-bs-target="#tab-deeper" type="button" role="tab" aria-controls="tab-deeper" aria-selected="false">Go deeper</button>
         </div>
       </nav>
@@ -67,6 +68,14 @@
               <ol class="purity-steps" id="puritySteps"></ol>
             </div>
           </div>
+        </section>
+
+        <!-- QR tracing: how a jar's code works (linked from Find your honey as learn.html#qr-tracing).
+             Steps come from QR_STEPS in js/learn.js -->
+        <section class="tab-pane fade" id="tab-qr-tracing" role="tabpanel" aria-labelledby="btn-qr-tracing" tabindex="0">
+          <h2 class="learn-title mb-4">How it works</h2>
+          <ol class="purity-steps qr-steps" id="qrSteps"></ol>
+          <p class="mt-4 mb-0"><a href="find-your-honey.html">Can't scan? Enter the code.</a></p>
         </section>
 
         <!-- Go deeper: cards from LEARN_SOURCES in js/learn-sources.js -->

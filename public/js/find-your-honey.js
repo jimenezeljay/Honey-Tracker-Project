@@ -1,4 +1,5 @@
-// Find your honey (find-your-honey.html): turns a typed jar code into its trace page.
+// Find your honey: turns a typed jar code into its trace page.
+// Used by find-your-honey.html and by the homepage pop-up (#findHoneyModal in index.html).
 // Accepts "HT-0011", "ht 11", "0011" or "11", and also a pasted trace link (...?batch=11).
 // Whether the batch exists is checked by product.html, which shows the not-found page if not.
 
@@ -31,3 +32,6 @@ codeInput.addEventListener('input', () => {
   codeError.classList.remove('d-block');
   codeInput.classList.remove('is-invalid');
 });
+
+// Homepage pop-up: put the cursor in the box as soon as it opens
+document.getElementById('findHoneyModal')?.addEventListener('shown.bs.modal', () => codeInput.focus());

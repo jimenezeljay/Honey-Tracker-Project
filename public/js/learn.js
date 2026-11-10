@@ -30,12 +30,19 @@ const PURITY_STEPS = [
   { title: 'Jar',   text: 'Each batch gets its own trace page and QR code, so you can follow your jar back to the hive it came from.' }
 ];
 
+// QR tracing tab: three short steps (counts toward the 22-word first view)
+const QR_STEPS = [
+  { icon: 'bi-journal-plus', text: 'A keeper logs the harvest.' },
+  { icon: 'bi-qr-code',      text: 'Each jar gets a QR label.' },
+  { icon: 'bi-phone',        text: 'Scan it to see the hive.' }
+];
+
 (function () {
   const tiles = document.getElementById('termTiles');
   const detail = document.getElementById('termDetail');
   if (!tiles || !detail) return;
 
-  const TAB_IDS = ['definitions', 'purity', 'deeper'];
+  const TAB_IDS = ['definitions', 'purity', 'qr-tracing', 'deeper'];
 
   // ---------- Build ----------
 
@@ -102,6 +109,17 @@ const PURITY_STEPS = [
           <span class="source-card__meta">${escapeHtml(s.publisher)}${s.date ? `, ${escapeHtml(s.date)}` : ''}</span>
         </a>
       </div>`).join('');
+  }
+
+  // ---------- QR tracing steps ----------
+
+  const qrSteps = document.getElementById('qrSteps');
+  if (qrSteps) {
+    qrSteps.innerHTML = QR_STEPS.map(step => `
+      <li class="purity-step">
+        <span class="qr-step__icon" aria-hidden="true"><i class="bi ${step.icon}"></i></span>
+        <p>${escapeHtml(step.text)}</p>
+      </li>`).join('');
   }
 
   // ---------- Tabs and the URL hash ----------

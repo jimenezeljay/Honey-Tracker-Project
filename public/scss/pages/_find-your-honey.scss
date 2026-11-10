@@ -41,3 +41,44 @@
     color: $body-color;
   }
 }
+
+.jar-label-sample--sm {
+  width: 110px;
+  flex-shrink: 0;
+}
+
+// Homepage pop-up
+.find-modal {
+  border: 0;
+  border-radius: 1rem;
+  background: $cream;
+
+  .modal-header {
+    border: 0;
+    padding: 1.5rem 1.5rem 0;
+  }
+
+  .modal-title {
+    font-size: 1.75rem;
+  }
+
+  .modal-body {
+    padding: .75rem 1.5rem 1rem;
+  }
+
+  .modal-footer {
+    justify-content: center;
+    gap: .5rem;
+    border-top: 1px solid $line;
+    padding: .9rem 1.5rem;
+
+    > * { margin: 0; }
+  }
+
+  &__help {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+}

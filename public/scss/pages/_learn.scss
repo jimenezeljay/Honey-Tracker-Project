@@ -200,6 +200,24 @@ $liquid-gold:  #C98A12;  // Liquid icon
   margin: 0 0 .35rem;
 }
 
+// ---- QR tracing steps (reuse the purity step cards, with an icon instead of a number) ----
+.qr-step__icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: rgba($amber, .18);
+  color: $amber-deep;
+  font-size: 1.35rem;
+  display: grid;
+  place-items: center;
+  margin: 0 auto .75rem;
+}
+
+.qr-steps .purity-step p {
+  font-size: 1.05rem;
+  color: $ink;
+}
+
 // ---- Go deeper cards ----
 .source-card {
   display: flex;
