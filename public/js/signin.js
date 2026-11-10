@@ -8,5 +8,6 @@ const signinForm = document.getElementById('signinForm');
 
 validateForm(signinForm, () => {
   signinForm.querySelector('[type="submit"]').disabled = true;
+  HTSession.signIn('keeper');   // js/components.js: keeps the beekeeper navbar on every page
   location.href = 'dashboard.html';
 });

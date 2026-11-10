@@ -190,7 +190,7 @@ function siteNav(active, role) {
               <li><a class="dropdown-item" href="dashboard.html">Dashboard</a></li>
               <li><a class="dropdown-item" href="#">Profile</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="signin.html">Sign out</a></li>
+              <li><a class="dropdown-item" href="signin.html?signed-out">Sign out</a></li>
             </ul>
           </div>`
     : `<a class="btn btn-outline-secondary" href="signin.html">Sign in</a>
@@ -334,6 +334,23 @@ function initSegTabs(bar) {
   return place;                               // call again if a tab's label changes
 }
 
+// Pretend sign-in until real login exists (HC-113). Sign in (js/signin.js) remembers
+// "keeper" in this browser so every page shows the beekeeper navbar, not just keeper pages.
+// Sign out goes to signin.html?signed-out, which forgets it.
+const HTSession = {
+  KEY: 'ht-signed-in-role',
+  role() {
+    try { return localStorage.getItem(this.KEY); } catch (error) { return null; }
+  },
+  signIn(role) {
+    try { localStorage.setItem(this.KEY, role); } catch (error) { /* storage blocked */ }
+  },
+  signOut() {
+    try { localStorage.removeItem(this.KEY); } catch (error) { /* storage blocked */ }
+  }
+};
+if (new URLSearchParams(location.search).has('signed-out')) HTSession.signOut();
+
 // Fill placeholders on the page:
 //   <div data-component="site-nav" data-active="map"></div>
 //   <div data-component="site-nav" data-role="keeper"></div>
@@ -341,7 +358,7 @@ function initSegTabs(bar) {
 //   <div data-component="site-footer"></div>
 //   <span data-badge="certified"></span>
 document.querySelectorAll('[data-component="site-nav"]').forEach(el => {
-  el.outerHTML = siteNav(el.dataset.active, el.dataset.role);
+  el.outerHTML = siteNav(el.dataset.active, el.dataset.role || HTSession.role());
 });
 document.querySelectorAll('[data-component="keeper-sidebar"]').forEach(el => {
   el.innerHTML = keeperSidebar(el.dataset.active);
