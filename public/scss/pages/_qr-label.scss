@@ -1,0 +1,93 @@
+// QR label page (qr-label.html). DRAFT: one label on plain paper.
+
+// The label: same look as the sample on the Find your honey page
+.qr-label {
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 1rem;
+  background: #fff;
+  border: 2px solid $amber;
+  border-radius: 1rem;
+  text-align: center;
+  color: $ink;
+
+  p { margin: 0; }
+
+  &__farm {
+    font-family: $headings-font-family;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  &__code svg {
+    display: block;
+    width: 100%;
+    max-width: 200px;
+    margin: .25rem auto 0;
+  }
+
+  &__scan {
+    font-size: .8rem;
+    color: $ink-soft;
+  }
+
+  &__id {
+    display: inline-block;
+    margin: .5rem 0 .25rem !important;
+    padding: .2rem .75rem;
+    border: 1px dashed $amber;
+    border-radius: .375rem;
+    background: $cream;
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: .02em;
+  }
+
+  &__honey {
+    font-size: .85rem;
+    color: $sage;
+  }
+
+  &__error {
+    padding: 2rem 0;
+    color: $ink-soft;
+  }
+}
+
+.qr-actions {
+  &__note {
+    margin: 1rem 0 0;
+    font-size: .875rem;
+    color: $ink-soft;
+  }
+}
+
+// Print just the label, at a fixed size (about 2.5 x 3.25 in), in the top-left corner
+@media print {
+  @page { margin: .5in; }
+
+  body * { visibility: hidden; }
+
+  .qr-label,
+  .qr-label * { visibility: visible; }
+
+  .qr-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2.5in;
+    max-width: none;
+    margin: 0;
+    padding: .15in .15in .1in;
+    border-width: 1.5pt;
+    border-radius: .15in;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+
+    &__farm { font-size: 11pt; }
+    &__code svg { max-width: 1.6in; }
+    &__scan { font-size: 7pt; }
+    &__id { font-size: 10pt; }
+    &__honey { font-size: 7.5pt; }
+  }
+}
