@@ -349,6 +349,100 @@ async function getKeeperApplication() {
   return { status: mockState() || 'under-review' };
 }
 
+// ---- Saved by the keeper (Add farm wizard, Log harvest) ----
+
+// No server to save to yet, so new records stay in this browser and join the sample
+// data when any page loads. That way a new farm shows on the dashboard and maps, and
+// a new batch has a working trace page. To start over: clearSavedKeeperRecords()
+const SAVED_KEEPER_RECORDS_KEY = 'ht-keeper-records';
+const SAVED_RECORD_LISTS = ['farms', 'hives', 'practices', 'nearbyFlowers', 'batches', 'timeline'];
+
+function readSavedKeeperRecords() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SAVED_KEEPER_RECORDS_KEY));
+    return saved && typeof saved === 'object' ? saved : {};
+  } catch (error) {
+    return {};
+  }
+}
+
+function clearSavedKeeperRecords() {
+  try { localStorage.removeItem(SAVED_KEEPER_RECORDS_KEY); } catch (error) { /* storage blocked */ }
+}
+
+SAVED_RECORD_LISTS.forEach(list => {
+  const records = readSavedKeeperRecords()[list];
+  if (Array.isArray(records)) MOCK[list].push(...records);
+});
+
+// Adds records to the sample data for this page and remembers them for the next one.
+function addSavedRecords(lists) {
+  const saved = readSavedKeeperRecords();
+  Object.entries(lists).forEach(([list, records]) => {
+    MOCK[list].push(...records);
+    saved[list] = [...(saved[list] || []), ...records];
+  });
+  try {
+    localStorage.setItem(SAVED_KEEPER_RECORDS_KEY, JSON.stringify(saved));
+  } catch (error) { /* storage blocked: it still shows until the page closes */ }
+}
+
+const nextId = list => Math.max(0, ...list.map(item => item.id)) + 1;
+
+// Add farm wizard. Later: POST /api/farms, then POST /api/farms/:id/hives.
+// Privacy rule: an approximate farm keeps only a rounded point (about 1 km), never its
+// hives' real spots, just like the sample approximate farms above.
+async function saveFarm({ farm, hives, practices, nearbyFlowers }) {
+  const exact = farm.precision === 'exact';
+  const average = key => hives.reduce((sum, hive) => sum + hive[key], 0) / hives.length;
+  const point = key => (exact ? average(key) : Number(average(key).toFixed(2)));
+
+  const newFarm = {
+    ...farm,
+    id: nextId(MOCK.farms),
+    keeperId: MOCK_SIGNED_IN_KEEPER_ID,
+    photo: null,
+    lat: point('lat'),
+    lng: point('lng'),
+    verification: 'self-reported',
+    certified: false
+  };
+  const firstHiveId = nextId(MOCK.hives);
+  const newHives = hives.map((hive, index) => ({
+    ...hive,
+    id: firstHiveId + index,
+    farmId: newFarm.id,
+    lat: exact ? hive.lat : newFarm.lat,
+    lng: exact ? hive.lng : newFarm.lng
+  }));
+
+  addSavedRecords({
+    farms: [newFarm],
+    hives: newHives,
+    practices: [{ ...practices, farmId: newFarm.id }],
+    nearbyFlowers: [{ ...nearbyFlowers, farmId: newFarm.id }]
+  });
+  return newFarm;
+}
+
+// Log harvest. Later: POST /api/batches.
+async function saveHarvest(harvest) {
+  const id = nextId(MOCK.batches);
+  const batch = {
+    ...harvest,
+    id,
+    batchNumber: String(id).padStart(4, '0'),
+    traceUrl: `product.html?batch=${id}`
+  };
+  const farm = byId(MOCK.farms, byId(MOCK.hives, batch.hiveIds[0]).farmId);
+
+  addSavedRecords({
+    batches: [batch],
+    timeline: [{ batchId: id, date: batch.harvestDate, stage: 'harvest', location: `${farm.county} County, ${farm.state}` }]
+  });
+  return batch;
+}
+
 // ---- QR labels ----
 
 // The full link a jar's QR code holds: qrLink(batch) -> 'https://.../product.html?batch=11'

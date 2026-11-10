@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log harvest · Honey Tracker</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Compiled CSS (already includes Bootstrap) -->
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <!-- Navbar and footer are built by js/components.js (edit them there, once) -->
+  <div data-component="site-nav" data-role="keeper"></div>
+
+  <!-- Log harvest. Stays hidden until js/harvest.js has confirmed an approved keeper. -->
+  <div class="container keeper-layout" id="keeperPage" hidden>
+    <div data-component="keeper-sidebar" data-active="harvest"></div>
+
+    <main class="keeper-main">
+      <header class="dashboard-header">
+        <h1>Log a harvest</h1>
+      </header>
+
+      <!-- Shown when the keeper has no hives to log from yet -->
+      <div class="empty-state panel" id="harvestNoFarms" hidden>
+        <h2 class="mb-3">No hives yet.</h2>
+        <p class="lead mb-4">Add a farm and pin your hives first.</p>
+        <a class="btn btn-primary btn-lg" href="add-farm.html">Add a farm</a>
+      </div>
+
+      <div class="row g-4" id="harvestFormArea" hidden>
+        <div class="col-xl-7">
+          <form class="panel" id="harvestForm" novalidate>
+            <div class="mb-3">
+              <label class="form-label" for="harvestFarm">Farm</label>
+              <select class="form-select" id="harvestFarm" name="farm" required></select>
+              <div class="invalid-feedback">Choose a farm.</div>
+            </div>
+
+            <fieldset class="mb-3" id="harvestHives" data-required-group>
+              <legend class="form-label fs-6">Hives</legend>
+              <div id="harvestHiveChecks"></div>
+              <div class="invalid-feedback">Pick at least one hive.</div>
+            </fieldset>
+
+            <div class="row g-3 mb-3">
+              <div class="col-sm-6">
+                <label class="form-label" for="harvestDate">Harvest date</label>
+                <input class="form-control" id="harvestDate" name="harvestDate" type="date" required>
+                <div class="invalid-feedback">Choose a date, today or earlier.</div>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label" for="harvestSeason">Season</label>
+                <select class="form-select" id="harvestSeason" name="season" required>
+                  <option value="" selected disabled>Choose a date first</option>
+                </select>
+                <div class="invalid-feedback">Choose a season.</div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-sm-6">
+                <label class="form-label" for="harvestQuantity">Quantity (lb)</label>
+                <input class="form-control" id="harvestQuantity" name="quantityLb" type="number" min="0.1" step="0.1" required>
+                <div class="invalid-feedback">Enter how many pounds.</div>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label" for="harvestType">Honey type</label>
+                <input class="form-control" id="harvestType" name="honeyType" type="text" list="honeyTypes" maxlength="60" required>
+                <datalist id="honeyTypes">
+                  <option value="Wildflower"></option>
+                  <option value="Clover"></option>
+                  <option value="Goldenrod"></option>
+                  <option value="Buckwheat"></option>
+                  <option value="Basswood"></option>
+                  <option value="Orange blossom"></option>
+                </datalist>
+                <div class="invalid-feedback">Enter the honey type.</div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-sm-6">
+                <label class="form-label" for="harvestTexture">Texture</label>
+                <select class="form-select" id="harvestTexture" name="texture" required>
+                  <option value="" selected disabled>Choose…</option>
+                  <option value="liquid">Liquid</option>
+                  <option value="crystallized">Crystallized</option>
+                  <option value="creamed">Creamed</option>
+                </select>
+                <div class="invalid-feedback">Choose a texture.</div>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label" for="harvestFlowers">Flower types</label>
+                <input class="form-control" id="harvestFlowers" name="flowerTypes" type="text" maxlength="200" placeholder="Clover, Aster" required aria-describedby="harvestFlowersHelp">
+                <div class="form-text" id="harvestFlowersHelp">Separate with commas.</div>
+                <div class="invalid-feedback">Enter at least one flower.</div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label" for="harvestNotes">Notes (optional)</label>
+              <textarea class="form-control" id="harvestNotes" name="notes" rows="3" maxlength="500" aria-describedby="harvestNotesCount"></textarea>
+              <div class="form-text text-end" id="harvestNotesCount" aria-live="polite">0 / 500</div>
+            </div>
+
+            <button class="btn btn-primary btn-lg w-100" type="submit">Save harvest</button>
+          </form>
+        </div>
+
+        <aside class="col-xl-5" aria-labelledby="previewTitle">
+          <div class="panel keeper-preview">
+            <h2 class="h5 mb-3" id="previewTitle">Batch preview</h2>
+            <ul class="list-unstyled mb-0" id="harvestPreview" aria-live="polite"></ul>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Shown after saving -->
+      <div class="empty-state panel" id="harvestSaved" tabindex="-1" hidden>
+        <h2 class="mb-3">Sweet! Harvest logged.</h2>
+        <p class="lead mb-4" id="harvestSavedText"></p>
+        <div class="d-flex flex-wrap gap-2 justify-content-center">
+          <a class="btn btn-primary" href="dashboard.html">Back to dashboard</a>
+          <a class="btn btn-outline-secondary" id="harvestTraceLink" href="#">See trace page</a>
+          <a class="btn btn-outline-secondary" href="log-harvest.html">Log another</a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div data-component="site-footer"></div>
+
+  <!-- Shared navbar + footer first (local file, so they appear without waiting on the CDN) -->
+  <script src="js/components.js"></script>
+  <!-- Bootstrap JS (dropdowns, tabs, offcanvas, modals). Goes at the end of body -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Your JS -->
+  <script src="js/main.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/forms.js"></script>
+  <script src="js/harvest.js"></script>
+</body>
+</html>

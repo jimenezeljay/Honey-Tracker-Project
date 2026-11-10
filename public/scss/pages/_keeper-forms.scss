@@ -1,0 +1,44 @@
+// Log harvest and Add farm wizard. Layout only: colors come from existing classes
+// (.panel, .dash-list, .map-box, .ht-pin), so this file adds no new colors.
+
+// Each step's heading gets focus for screen readers; it isn't something to click
+.wizard-step h2:focus {
+  outline: none;
+}
+
+// Back and Next buttons
+.wizard-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .5rem;
+
+  [data-wizard-back] { margin-right: auto; }
+}
+
+.wizard-photo {
+  display: block;
+  max-height: 10rem;
+  max-width: 100%;
+}
+
+// Forage radius input in a hive row
+.wizard-radius {
+  width: 7.5rem;
+}
+
+// A label and its value: Batch preview and the wizard's Review step
+.keeper-preview__row {
+  display: grid;
+  grid-template-columns: 8rem minmax(0, 1fr);
+  gap: .75rem;
+  padding-block: .4rem;
+  overflow-wrap: anywhere;
+}
+
+// The batch preview stays in view beside a long form
+@include media-breakpoint-up(xl) {
+  .keeper-preview {
+    position: sticky;
+    top: 1.5rem;
+  }
+}
