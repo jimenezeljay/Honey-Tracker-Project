@@ -134,14 +134,14 @@ getKeeperDashboard().then(data => {
   if (document.readyState === 'complete') jumpToSection();
   else window.addEventListener('load', jumpToSection);
 
-  // Highlight the sidebar item for the section in the address (#farms, #listings)
+  // Highlight the account panel item for the section in the address (#farms, #listings)
   syncSidebar();
   window.addEventListener('hashchange', syncSidebar);
 });
 
 function syncSidebar() {
   const current = `dashboard.html${location.hash === '#farms' || location.hash === '#listings' ? location.hash : ''}`;
-  document.querySelectorAll('.keeper-sidebar .nav-link').forEach(link => {
+  document.querySelectorAll('.account-panel .nav-link').forEach(link => {
     const on = link.getAttribute('href') === current;
     link.classList.toggle('active', on);
     if (on) link.setAttribute('aria-current', 'page');

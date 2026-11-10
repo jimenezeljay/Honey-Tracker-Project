@@ -281,3 +281,11 @@
   render();
   page.setAttribute('aria-busy', 'false');
 })();
+
+// cart.html#saved (from the account panel) opens Saved for later
+function showSavedFromHash() {
+  const btn = document.getElementById('btn-saved');
+  if (location.hash === '#saved' && btn && typeof bootstrap !== 'undefined') bootstrap.Tab.getOrCreateInstance(btn).show();
+}
+showSavedFromHash();
+window.addEventListener('hashchange', showSavedFromHash);

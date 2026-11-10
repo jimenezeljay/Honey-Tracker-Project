@@ -23,12 +23,11 @@
 <body>
 
   <!-- Navbar and footer are built by js/components.js (edit them there, once) -->
-  <div data-component="site-nav" data-role="keeper"></div>
+  <div data-component="site-nav" data-role="keeper" data-account-active="farms"></div>
 
   <!-- Add farm and hive wizard. Each step is its own form, checked before moving on.
        Stays hidden until js/wizard.js has confirmed an approved keeper. -->
   <div class="container keeper-layout" id="keeperPage" hidden>
-    <div data-component="keeper-sidebar" data-active="farms"></div>
 
     <main class="keeper-main">
       <header class="dashboard-header">

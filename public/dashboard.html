@@ -23,12 +23,11 @@
 <body>
 
   <!-- Navbar and footer are built by js/components.js (edit them there, once) -->
-  <div data-component="site-nav" data-role="keeper"></div>
+  <div data-component="site-nav" data-role="keeper" data-account-active="dashboard"></div>
 
   <!-- Beekeeper dashboard (wireframe 13). Stays hidden until js/dashboard.js has confirmed
        an approved keeper and filled it with that keeper's own records. -->
   <div class="container keeper-layout" id="keeperPage" hidden>
-    <div data-component="keeper-sidebar" data-active="dashboard"></div>
 
     <main class="keeper-main">
       <header class="dashboard-header">

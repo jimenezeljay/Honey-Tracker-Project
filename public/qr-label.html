@@ -20,14 +20,13 @@
 <body>
 
   <!-- Navbar and footer are built by js/components.js (edit them there, once) -->
-  <div data-component="site-nav" data-role="keeper"></div>
+  <div data-component="site-nav" data-role="keeper" data-account-active="harvest"></div>
 
   <!-- QR label (wireframe 16). DRAFT: one label on plain paper for now.
        Opened from the dashboard's "QR label" buttons as qr-label.html?batch=1.
        The QR holds SITE_URL + the batch's traceUrl (js/data.js), so it opens the public trace page.
        Stays hidden until js/qr-label.js has confirmed an approved keeper. -->
   <div class="container keeper-layout" id="keeperPage" hidden>
-    <div data-component="keeper-sidebar" data-active="harvest"></div>
 
     <main class="keeper-main">
       <h1 class="mb-4">QR label</h1>

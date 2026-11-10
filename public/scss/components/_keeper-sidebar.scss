@@ -1,35 +1,29 @@
-// Beekeeper pages: menu column + content. The menu comes from keeperSidebar() in js/components.js.
-//   <div class="container keeper-layout">
-//     <div data-component="keeper-sidebar" data-active="dashboard"></div>
-//     <main class="keeper-main">...</main>
-//   </div>
+// Account panel: the round account button in the top bar opens it from the right
+// (siteNav and accountPanel in js/components.js). Keepers get their menu here;
+// shoppers get orders, saved and cart. Keeper pages use the full width:
+//   <div class="container keeper-layout"> <main class="keeper-main">...</main> </div>
 .keeper-layout {
   padding-block: 2rem 1rem;
 }
 
-@include media-breakpoint-up(lg) {
-  .keeper-layout {
-    display: grid;
-    grid-template-columns: 15rem minmax(0, 1fr);
-    gap: 2.5rem;
+.account-panel {
+  --bs-offcanvas-width: 20rem;
+  background: $cream;
 
-    // The hat icon hides the menu column
-    &.menu-hidden {
-      grid-template-columns: minmax(0, 1fr);
-
-      [data-component="keeper-sidebar"] { display: none; }
-    }
+  .offcanvas-header {
+    align-items: flex-start;
+    border-bottom: 1px solid $line;
   }
 
-  // The menu stays in view while the content scrolls
-  .keeper-sidebar {
-    position: sticky;
-    top: 1.5rem;
-  }
-}
+  .offcanvas-title { font-size: 1.5rem; }
 
-.keeper-sidebar {
-  --bs-offcanvas-width: 18rem; // phone drawer width
+  .offcanvas-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .nav { gap: .15rem; }
 
   .nav-link {
     display: flex;
@@ -47,11 +41,78 @@
       background: rgba($amber, .2);
       box-shadow: inset 3px 0 0 $amber;
     }
+
+    // No page yet
+    &.is-soon,
+    &.is-soon:hover { color: $ink-soft; background: none; cursor: default; opacity: .75; }
+  }
+
+  .soon-tag {
+    margin-left: auto;
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: $ink-soft;
+    background: rgba($sage, .2);
+    border-radius: 999px;
+    padding: .1rem .5rem;
+  }
+
+  &__divider {
+    height: 1px;
+    margin: .5rem .8rem;
+    background: $line;
   }
 }
 
-// The hat in the top bar
-.keeper-hat svg {
-  width: 1.35rem;
-  height: 1.35rem;
+// The round account button in the top bar
+.account-button {
+  font-size: 1.2rem;
+
+  svg {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+}
+
+// Sign-up (get-started.html): two cards to pick shopping or beekeeping
+.signup { max-width: 720px; }
+
+.role-card {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+  height: 100%;
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid $line;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: border-color .15s ease, box-shadow .15s ease;
+
+  &:hover { border-color: rgba($amber, .6); }
+
+  .choice-icon { margin-bottom: .35rem; }
+
+  &__title {
+    font-family: $headings-font-family;
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: $ink;
+  }
+
+  &__text { color: $ink-soft; }
+}
+
+.btn-check:checked + .role-card {
+  border-color: $amber;
+  box-shadow: 0 0 0 3px rgba($amber, .3);
+
+  .choice-icon { background: rgba($amber, .25); }
+}
+
+.btn-check:focus-visible + .role-card {
+  outline: 3px solid rgba($amber, .6);
+  outline-offset: 2px;
 }
