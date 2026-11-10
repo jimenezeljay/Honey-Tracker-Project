@@ -149,6 +149,7 @@
     document.getElementById('harvestFormArea').hidden = true;
     document.getElementById('harvestSavedText').textContent = `Batch ${batch.batchNumber} is on your dashboard.`;
     document.getElementById('harvestTraceLink').href = batch.traceUrl;
+    document.getElementById('harvestLabelLink').href = `qr-label.html?batch=${encodeURIComponent(batch.id)}`;
     const saved = document.getElementById('harvestSaved');
     saved.hidden = false;
     saved.focus();
