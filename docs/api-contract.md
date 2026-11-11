@@ -254,6 +254,36 @@ A brand-new keeper gets empty arrays. A suspended keeper gets `keeper.certificat
 
 ---
 
+## Keeper saves (built on the frontend, using browser storage for now)
+
+`saveFarm()` and `saveHarvest()` in `data.js` keep new records in the browser's `localStorage` until these endpoints exist. Both need an approved keeper, worked out from the session as above. The server sets `id`, `keeperId`, `verification` (`self-reported`), `certified` (`false`), `batchNumber` and `traceUrl`.
+
+### `POST /api/farms`, then `POST /api/farms/:id/hives` (Add farm wizard, HC-68)
+
+```json
+{
+  "farm": { "name": "Sunrise Farm", "description": "...", "county": "Jefferson", "state": "OH", "precision": "exact" },
+  "hives": [ { "label": "H1", "lat": 40.362, "lng": -80.652, "forageRadiusMi": 2, "beeType": "Italian" } ],
+  "practices": { "feedingNotes": "...", "pestNotes": "..." },
+  "nearbyFlowers": { "flowers": ["Clover"], "pesticideNotes": "..." }
+}
+```
+
+The server works out the farm's `lat` and `lng` from its hives. For `precision: "approximate"`, public responses must follow the privacy rule above. The browser version keeps only the rounded point. The wizard previews a farm photo but doesn't send it yet.
+
+### `POST /api/batches` (Log harvest, HC-69)
+
+```json
+{
+  "hiveIds": [1, 2], "harvestDate": "2026-06-14", "season": "Summer 2026", "quantityLb": 40,
+  "honeyType": "Wildflower", "texture": "liquid", "flowerTypes": ["Clover"], "flags": [], "notes": ""
+}
+```
+
+The server must check that every hive belongs to the signed-in keeper, and should add a `harvest` timeline event. The new batch has no pollen profile until one is added.
+
+---
+
 ## Coming next (not built on the frontend yet)
 
 These pages will need endpoints that **write** data. We'll add shapes here as each page is built.
@@ -265,8 +295,6 @@ These pages will need endpoints that **write** data. We'll add shapes here as ea
 | Beekeeper application | `POST /api/keeper/application` | |
 | Edit my application | `PUT /api/keeper/application` | HC-124 |
 | Profile | `GET` / `PUT /api/me` | HC-125 |
-| Add farm and hives | `POST /api/farms`, `POST /api/farms/:id/hives` | HC-68 |
-| Log a harvest | `POST /api/batches` | HC-69 |
 | QR label | uses the batch's `traceUrl` | HC-70 |
 
 **The cart** lives in the shopper's browser for now (saved locally, not on the server). It only needs the server at checkout, when the order is sent and the server **re-checks every price and stock level**. Never trust prices sent from the browser.

@@ -23,25 +23,42 @@
 
   <main class="container market">
     <!-- Wireframe 4: title and sort on top, filters on the left, card grid on the right.
-         Below lg the filters move into a slide-in panel opened by the Filters button (wireframe 17). -->
+         The filters live in a slide-in panel on every screen size, opened by the Filters button,
+         so the honey gets the full width. Active filters show as chips under the header. -->
     <header class="market-head">
       <div>
         <h1 class="mb-1">Marketplace</h1>
         <p class="text-soft mb-0">Certified honey, traced to the hive.</p>
       </div>
 
+      <!-- Centered between the title and Sort on desktop; its own full-width row below that -->
+      <div class="search-pill market-search" role="search">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input class="form-control" id="searchInput" name="q" form="filterForm" type="search" placeholder="Search honey or farms" aria-label="Search honey or farms" autocomplete="off">
+      </div>
+
       <div class="market-tools">
-        <button class="btn btn-outline-secondary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterPanel" aria-controls="filterPanel">
-          <i class="bi bi-sliders" aria-hidden="true"></i> Filters <span class="badge text-bg-primary ms-1 d-none" id="filterCount"></span>
+        <button class="pill-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterPanel" aria-controls="filterPanel">
+          <i class="bi bi-sliders" aria-hidden="true"></i> Filters <span class="pill-btn__count d-none" id="filterCount"></span>
         </button>
-        <div class="market-sort">
-          <label class="form-label mb-0 text-soft" for="sortSelect">Sort</label>
-          <select class="form-select" id="sortSelect" name="sort" form="filterForm">
-            <option value="nearest">Nearest to me</option>
-            <option value="price">Lowest price</option>
-            <option value="newest">Newest harvest</option>
-          </select>
+
+        <!-- Sort menu. The hidden select below holds the value for the form and the URL. -->
+        <div class="dropdown">
+          <button class="pill-btn dropdown-toggle" type="button" id="sortButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-arrow-down-up" aria-hidden="true"></i> <span class="visually-hidden">Sort: </span><span id="sortLabel">Nearest</span>
+            <i class="bi bi-chevron-down pill-btn__chevron" aria-hidden="true"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end sort-menu" aria-labelledby="sortButton">
+            <li><button class="dropdown-item" type="button" data-sort="nearest">Nearest to me</button></li>
+            <li><button class="dropdown-item" type="button" data-sort="price">Lowest price</button></li>
+            <li><button class="dropdown-item" type="button" data-sort="newest">Newest harvest</button></li>
+          </ul>
         </div>
+        <select class="visually-hidden" id="sortSelect" name="sort" form="filterForm" tabindex="-1" aria-hidden="true">
+          <option value="nearest">Nearest to me</option>
+          <option value="price">Lowest price</option>
+          <option value="newest">Newest harvest</option>
+        </select>
       </div>
     </header>
 
@@ -52,100 +69,99 @@
       <button type="button" class="btn btn-link btn-sm p-0 align-baseline" id="useLocation">Use my location</button>
     </p>
 
-    <div class="row g-4">
-      <!-- Filters: inline column on lg+, slide-in panel below lg -->
-      <div class="col-lg-3">
-        <div class="offcanvas-lg offcanvas-start filter-panel" tabindex="-1" id="filterPanel" aria-labelledby="filterPanelLabel">
-          <div class="offcanvas-header">
-            <h2 class="offcanvas-title h5" id="filterPanelLabel">Filters</h2>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#filterPanel" aria-label="Close filters"></button>
-          </div>
+    <!-- Active filters, each removable on its own -->
+    <div class="filter-chips" id="filterChips" aria-label="Active filters" hidden></div>
 
-          <div class="offcanvas-body">
-            <form id="filterForm" class="filter-form" aria-label="Filter honey">
-              <div class="filter-group">
-                <label class="form-label" for="typeSelect">Honey type</label>
-                <select class="form-select" id="typeSelect" name="type">
-                  <option value="">All types</option>
-                </select>
-              </div>
-
-              <!-- A honey is only ever one of these, so it's a single choice -->
-              <div class="filter-group">
-                <label class="form-label" for="textureSelect">Texture</label>
-                <select class="form-select" id="textureSelect" name="texture">
-                  <option value="">Any texture</option>
-                  <option value="liquid">Liquid</option>
-                  <option value="crystallized">Crystallized</option>
-                  <option value="creamed">Creamed</option>
-                </select>
-              </div>
-
-              <div class="filter-group">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="verifiedOnly" name="verified" value="1">
-                  <label class="form-check-label" for="verifiedOnly">Volunteer-Verified only</label>
-                </div>
-              </div>
-
-              <fieldset class="filter-group">
-                <legend class="form-label">Badges</legend>
-                <div id="badgeChecks"></div>
-              </fieldset>
-
-              <div class="filter-group">
-                <label class="form-label" for="stateSelect">Region / state</label>
-                <select class="form-select" id="stateSelect" name="state">
-                  <option value="">All states</option>
-                </select>
-              </div>
-
-              <fieldset class="filter-group">
-                <legend class="form-label">Price range</legend>
-                <div class="price-range">
-                  <div class="input-group">
-                    <span class="input-group-text">$</span>
-                    <input class="form-control" type="number" id="priceMin" name="min" min="0" step="1" placeholder="Min" aria-label="Minimum price">
-                  </div>
-                  <span class="text-soft" aria-hidden="true">to</span>
-                  <div class="input-group">
-                    <span class="input-group-text">$</span>
-                    <input class="form-control" type="number" id="priceMax" name="max" min="0" step="1" placeholder="Max" aria-label="Maximum price">
-                  </div>
-                </div>
-              </fieldset>
-
-              <div class="filter-group">
-                <label class="form-label" for="seasonSelect">Season harvested</label>
-                <select class="form-select" id="seasonSelect" name="season">
-                  <option value="">Any season</option>
-                </select>
-              </div>
-
-              <div class="filter-actions">
-                <button class="btn btn-primary d-lg-none" type="button" data-bs-dismiss="offcanvas" data-bs-target="#filterPanel" id="showResults">Show results</button>
-                <button class="btn btn-link" type="reset" id="clearFilters">Clear filters</button>
-              </div>
-            </form>
-          </div>
-        </div>
+    <!-- Filters: slide-in panel from the left -->
+    <div class="offcanvas offcanvas-start filter-panel" tabindex="-1" id="filterPanel" aria-labelledby="filterPanelLabel">
+      <div class="offcanvas-header">
+        <h2 class="offcanvas-title h5" id="filterPanelLabel">Filters</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#filterPanel" aria-label="Close filters"></button>
       </div>
 
-      <!-- Results -->
-      <section class="col-lg-9" aria-labelledby="resultCount">
-        <h2 class="visually-hidden">Results</h2>
-        <p class="visually-hidden" id="resultCount" aria-live="polite"></p>
-        <div class="row g-3" id="listingGrid"></div>
+      <div class="offcanvas-body">
+        <form id="filterForm" class="filter-form" aria-label="Filter honey">
+          <div class="filter-group">
+            <label class="form-label" for="typeSelect">Honey type</label>
+            <select class="form-select" id="typeSelect" name="type">
+              <option value="">All types</option>
+            </select>
+          </div>
 
-        <!-- No matches -->
-        <div class="empty-state" id="noResults" hidden>
-          <i class="bi bi-funnel empty-icon" aria-hidden="true"></i>
-          <h2 class="h3 mt-3">No honey matches</h2>
-          <p class="lead">Try fewer filters.</p>
-          <button class="btn btn-primary" type="button" id="clearFromEmpty">Clear filters</button>
-        </div>
-      </section>
+          <!-- A honey is only ever one of these, so it's a single choice -->
+          <div class="filter-group">
+            <label class="form-label" for="textureSelect">Texture</label>
+            <select class="form-select" id="textureSelect" name="texture">
+              <option value="">Any texture</option>
+              <option value="liquid">Liquid</option>
+              <option value="crystallized">Crystallized</option>
+              <option value="creamed">Creamed</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="verifiedOnly" name="verified" value="1">
+              <label class="form-check-label" for="verifiedOnly">Volunteer-Verified only</label>
+            </div>
+          </div>
+
+          <fieldset class="filter-group">
+            <legend class="form-label">Badges</legend>
+            <div id="badgeChecks"></div>
+          </fieldset>
+
+          <div class="filter-group">
+            <label class="form-label" for="stateSelect">Region / state</label>
+            <select class="form-select" id="stateSelect" name="state">
+              <option value="">All states</option>
+            </select>
+          </div>
+
+          <fieldset class="filter-group">
+            <legend class="form-label">Price range</legend>
+            <div class="price-range">
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input class="form-control" type="number" id="priceMin" name="min" min="0" step="1" placeholder="Min" aria-label="Minimum price">
+              </div>
+              <span class="text-soft" aria-hidden="true">to</span>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input class="form-control" type="number" id="priceMax" name="max" min="0" step="1" placeholder="Max" aria-label="Maximum price">
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="filter-group">
+            <label class="form-label" for="seasonSelect">Season harvested</label>
+            <select class="form-select" id="seasonSelect" name="season">
+              <option value="">Any season</option>
+            </select>
+          </div>
+
+          <div class="filter-actions">
+            <button class="btn btn-primary" type="button" data-bs-dismiss="offcanvas" data-bs-target="#filterPanel" id="showResults">Show results</button>
+            <button class="btn btn-link" type="reset" id="clearFilters">Clear filters</button>
+          </div>
+        </form>
+      </div>
     </div>
+
+    <!-- Results -->
+    <section aria-labelledby="resultCount">
+      <h2 class="visually-hidden">Results</h2>
+      <p class="visually-hidden" id="resultCount" aria-live="polite"></p>
+      <div class="row g-3" id="listingGrid"></div>
+
+      <!-- No matches -->
+      <div class="empty-state" id="noResults" hidden>
+        <i class="bi bi-funnel empty-icon" aria-hidden="true"></i>
+        <h2 class="h3 mt-3">No honey matches</h2>
+        <p class="lead">Try fewer filters.</p>
+        <button class="btn btn-primary" type="button" id="clearFromEmpty">Clear filters</button>
+      </div>
+    </section>
   </main>
 
   <div data-component="site-footer"></div>

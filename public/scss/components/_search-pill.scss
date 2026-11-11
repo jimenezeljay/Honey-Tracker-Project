@@ -1,0 +1,116 @@
+// Search bar used on the Marketplace, the Map page and the homepage map.
+// One white pill: icon + input. The whole pill lights up amber while typing.
+//   <div class="search-pill" role="search">
+//     <i class="bi bi-search" aria-hidden="true"></i>
+//     <input class="form-control" type="search" ...>
+//   </div>
+// .search-pill--sm is the shorter version that floats over a map.
+// .search-pill--action has a round amber button inside on the right (Find your honey).
+// .pill-btn (bottom of this file) is the matching round button, e.g. Filters and Sort.
+.search-pill {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  height: 3rem;
+  padding: 0 .5rem 0 1.1rem;
+  background: #fff;
+  border: 1px solid rgba($ink-soft, .4);
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba($ink, .06);
+  transition: border-color .15s ease, box-shadow .15s ease;
+
+  i { color: $ink-soft; font-size: 1.05rem; }
+
+  .form-control {
+    height: 100%;
+    padding: 0;
+    font-size: 1.05rem;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    outline: none;
+
+    // The browser's clear "x", recolored to match (it's blue by default)
+    &::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      width: 1rem;
+      height: 1rem;
+      margin-right: .4rem;
+      cursor: pointer;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%236A5A45'%3E%3Cpath d='M2.1 2.1a1 1 0 0 1 1.4 0L8 6.6l4.5-4.5a1 1 0 1 1 1.4 1.4L9.4 8l4.5 4.5a1 1 0 0 1-1.4 1.4L8 9.4l-4.5 4.5a1 1 0 0 1-1.4-1.4L6.6 8 2.1 3.5a1 1 0 0 1 0-1.4z'/%3E%3C/svg%3E") center / .7rem no-repeat;
+    }
+  }
+
+  &:hover { border-color: rgba($ink-soft, .65); }
+
+  &:focus-within {
+    border-color: $amber;
+    box-shadow: 0 0 0 .25rem rgba($amber, .25);
+  }
+}
+
+.search-pill--sm {
+  height: 2.6rem;
+  padding-left: .95rem;
+
+  .form-control { font-size: .95rem; }
+}
+
+// With a button inside on the right, e.g. "Trace it"
+.search-pill--action {
+  height: 3.25rem;
+  padding-right: .3rem;
+
+  .btn {
+    flex-shrink: 0;
+    height: calc(100% - .6rem);
+    padding-inline: 1.25rem;
+    font-weight: 600;
+    border-radius: 999px;
+  }
+}
+
+// Red outline when the input is marked invalid (the pill shows it, not the input)
+.search-pill:has(.is-invalid) {
+  border-color: $danger;
+
+  .form-control.is-invalid,
+  .form-control.is-invalid:focus { background-image: none; padding-right: 0; border: 0; box-shadow: none; }
+
+  &:focus-within { box-shadow: 0 0 0 .25rem rgba($danger, .2); }
+}
+
+// Round white button that sits next to a search pill (Filters, Sort)
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  height: 3rem;
+  padding: 0 1.1rem;
+  font-weight: 600;
+  color: $ink;
+  white-space: nowrap;
+  background: #fff;
+  border: 1px solid rgba($ink-soft, .4);
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba($ink, .06);
+  transition: border-color .15s ease, box-shadow .15s ease;
+
+  i { color: $ink-soft; font-size: 1.05rem; }
+  &.dropdown-toggle::after { display: none; } // uses a chevron icon instead
+  .pill-btn__chevron { font-size: .75rem; margin-left: -.1rem; }
+
+  &:hover { border-color: rgba($ink-soft, .65); }
+  &:focus-visible { outline: none; border-color: $amber; box-shadow: 0 0 0 .25rem rgba($amber, .25); }
+}
+
+// Small amber count inside a pill button ("Filters 2")
+.pill-btn__count {
+  min-width: 1.4rem;
+  padding: .1rem .4rem;
+  font-size: .75rem;
+  text-align: center;
+  color: $ink;
+  background: $amber;
+  border-radius: 999px;
+}

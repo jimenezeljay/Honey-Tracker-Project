@@ -200,6 +200,39 @@ $liquid-gold:  #C98A12;  // Liquid icon
   margin: 0 0 .35rem;
 }
 
+// ---- QR tracing steps (reuse the purity step cards, with an icon instead of a number) ----
+.qr-step__icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: rgba($amber, .18);
+  color: $amber-deep;
+  font-size: 1.35rem;
+  display: grid;
+  place-items: center;
+  margin: 0 auto .75rem;
+}
+
+// The step card is the tile button itself, so the list item only keeps the arrow
+.qr-steps .purity-step {
+  padding: 0;
+  background: none;
+  border: 0;
+}
+
+.qr-tile .qr-step__icon { margin-bottom: .25rem; }
+
+.qr-tile__text {
+  font-size: 1.05rem;
+}
+
+// Detail panel: label on its own line above the text
+.qr-detail {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .35rem;
+}
+
 // ---- Go deeper cards ----
 .source-card {
   display: flex;

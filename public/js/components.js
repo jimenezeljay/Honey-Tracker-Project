@@ -170,29 +170,26 @@ const HTCart = (function () {
   return { cart, saved, count, add, setQty, remove, saveForLater, unsave, moveToCart, updateNavCount };
 })();
 
-// siteNav('map')         -> the top bar, with "Map" marked as the current page
-// siteNav(null, 'keeper') -> the signed-in beekeeper version: hat icon + Account menu.
-// Until sign-in is connected, a page picks this with data-role="keeper" on its placeholder.
+// siteNav('map')            -> the top bar, with "Map" marked as the current page
+// siteNav(null, 'keeper')    -> signed in as a beekeeper; 'shopper' -> signed in as a shopper.
+// Signed in, the bar shows a round account button that opens the account panel (accountPanel
+// below) from the right. Signed out, it shows Sign in and Get started.
+// Until real login exists, the role comes from data-role on the placeholder or HTSession.
 function siteNav(active, role) {
   const link = (page, label) =>
     `<li class="nav-item"><a class="nav-link${active === page ? ' active' : ''}" href="${page}.html"${active === page ? ' aria-current="page"' : ''}>${label}</a></li>`;
 
-  // The hat stays outside the collapsing menu so it's always visible on phones.
-  // It opens the beekeeper menu where there is one; elsewhere it links to the dashboard.
-  const keeperHat = role === 'keeper'
-    ? `<a class="btn btn-outline-secondary btn-icon keeper-hat order-lg-last ms-auto ms-lg-2 me-2 me-lg-0" href="dashboard.html" data-keeper-menu-toggle aria-label="Beekeeper menu" title="Beekeeper menu">${icon('keeper-hat')}</a>`
+  const signedIn = role === 'keeper' || role === 'shopper';
+
+  // Stays outside the collapsing menu so it's always one tap away on phones
+  const accountButton = signedIn
+    ? `<button class="btn btn-outline-secondary btn-icon account-button order-lg-last ms-auto ms-lg-2 me-2 me-lg-0" type="button"
+         data-bs-toggle="offcanvas" data-bs-target="#accountPanel" aria-controls="accountPanel"
+         aria-label="Your account" title="Your account">${role === 'keeper' ? icon('keeper-hat') : '<i class="bi bi-person" aria-hidden="true"></i>'}</button>`
     : '';
 
-  const actions = role === 'keeper'
-    ? `<div class="dropdown">
-            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Account</button>
-            <ul class="dropdown-menu dropdown-menu-lg-end">
-              <li><a class="dropdown-item" href="dashboard.html">Dashboard</a></li>
-              <li><a class="dropdown-item" href="#">Profile</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="signin.html">Sign out</a></li>
-            </ul>
-          </div>`
+  const actions = signedIn
+    ? ''
     : `<a class="btn btn-outline-secondary" href="signin.html">Sign in</a>
             <a class="btn btn-primary" href="get-started.html">Get started</a>`;
 
@@ -203,7 +200,7 @@ function siteNav(active, role) {
     <nav class="navbar navbar-expand-lg site-nav">
       <div class="container">
         <a class="navbar-brand" href="index.html"><span class="brand-mark"><img src="images/honey-tracker-logo.png" alt="" class="brand-logo"></span> Honey Tracker</a>
-        ${keeperHat}
+        ${accountButton}
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Open menu">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -219,6 +216,54 @@ function siteNav(active, role) {
     </nav>`;
 }
 
+// accountPanel('keeper', 'dashboard') -> the panel the account button opens, from the right.
+//   keeper:  the beekeeper menu (Dashboard, farms, harvests, listings) plus cart and sign out
+//   shopper: orders, saved for later, cart, sign out
+// `active` marks the current page (data-account-active on the site-nav placeholder).
+// Items without a page yet show "Soon" instead of being dead links.
+function accountPanel(role, active) {
+  const items = role === 'keeper'
+    ? [
+        { key: 'dashboard', label: 'Dashboard',        icon: 'bi-speedometer2', href: 'dashboard.html' },
+        { key: 'farms',     label: 'My Farms & Hives', icon: 'bi-geo-alt',      href: 'dashboard.html#farms' },
+        { key: 'harvest',   label: 'Log Harvest',      icon: 'bi-journal-plus', href: 'log-harvest.html' },
+        { key: 'listings',  label: 'My Listings',      icon: 'bi-shop',         href: 'dashboard.html#listings' },
+        { key: 'profile',   label: 'Profile',          icon: 'bi-person' },
+        'divider',
+        { key: 'cart',      label: 'Cart',             icon: 'bi-bag',          href: 'cart.html' }
+      ]
+    : [
+        { key: 'orders',    label: 'Past orders',      icon: 'bi-receipt' },
+        { key: 'saved',     label: 'Saved for later',  icon: 'bi-bookmark',     href: 'cart.html#saved' },
+        { key: 'cart',      label: 'Cart',             icon: 'bi-bag',          href: 'cart.html' },
+        { key: 'profile',   label: 'Profile',          icon: 'bi-person' }
+      ];
+
+  const rows = items.map(item => {
+    if (item === 'divider') return '<li class="account-panel__divider" role="separator"></li>';
+    const on = active === item.key;
+    const inner = `<i class="bi ${item.icon}" aria-hidden="true"></i> ${escapeHtml(item.label)}`;
+    return item.href
+      ? `<li class="nav-item"><a class="nav-link${on ? ' active' : ''}" href="${item.href}"${on ? ' aria-current="page"' : ''}>${inner}</a></li>`
+      : `<li class="nav-item"><span class="nav-link is-soon" aria-disabled="true">${inner} <span class="soon-tag">Soon</span></span></li>`;
+  }).join('');
+
+  return `
+    <aside class="offcanvas offcanvas-end account-panel" tabindex="-1" id="accountPanel" aria-labelledby="accountPanelTitle">
+      <div class="offcanvas-header">
+        <div>
+          <p class="eyebrow mb-1">${role === 'keeper' ? 'Beekeeper' : 'Shopper'}</p>
+          <h2 class="offcanvas-title" id="accountPanelTitle">Your account</h2>
+        </div>
+        <button class="btn-close" type="button" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="nav flex-column">${rows}</ul>
+        <a class="btn btn-outline-secondary w-100 mt-auto" href="signin.html?signed-out">Sign out</a>
+      </div>
+    </aside>`;
+}
+
 function siteFooter() {
   return `
     <footer class="site-footer mt-5">
@@ -227,44 +272,13 @@ function siteFooter() {
         <nav class="d-flex flex-wrap gap-3" aria-label="Footer">
           <a href="#">About</a>
           <a href="learn.html">Learn</a>
-          <a href="get-started.html">Become a keeper</a>
+          <a href="find-your-honey.html">Trace a jar</a>
+          <a href="get-started.html?role=keeper">Become a keeper</a>
           <a href="volunteer.html">Volunteer</a>
           <a href="#">Contact</a>
         </nav>
       </div>
     </footer>`;
-}
-
-// keeperSidebar('dashboard') -> the beekeeper menu (wireframes 13, 15, 16).
-// A column on large screens, a slide-in drawer on phones. The hat in the top bar toggles it.
-// My Farms & Hives and My Listings have no pages of their own yet, so they jump to
-// their dashboard sections. Profile is a placeholder until it has a page.
-function keeperSidebar(active) {
-  const items = [
-    { key: 'dashboard', label: 'Dashboard',        icon: 'bi-speedometer2', href: 'dashboard.html' },
-    { key: 'farms',     label: 'My Farms & Hives', icon: 'bi-geo-alt',      href: 'dashboard.html#farms' },
-    { key: 'harvest',   label: 'Log Harvest',      icon: 'bi-journal-plus', href: 'log-harvest.html' },
-    { key: 'listings',  label: 'My Listings',      icon: 'bi-shop',         href: 'dashboard.html#listings' },
-    { key: 'profile',   label: 'Profile',          icon: 'bi-person',       href: '#' }
-  ];
-  const links = items.map(item => `
-          <li class="nav-item">
-            <a class="nav-link${active === item.key ? ' active' : ''}" href="${item.href}"${active === item.key ? ' aria-current="page"' : ''}>
-              <i class="bi ${item.icon}" aria-hidden="true"></i> ${escapeHtml(item.label)}
-            </a>
-          </li>`).join('');
-
-  return `
-    <aside class="offcanvas-lg offcanvas-start keeper-sidebar" tabindex="-1" id="keeperMenu" aria-labelledby="keeperMenuLabel">
-      <div class="offcanvas-header">
-        <h2 class="offcanvas-title h5" id="keeperMenuLabel">Beekeeper menu</h2>
-        <button class="btn-close" type="button" data-bs-dismiss="offcanvas" data-bs-target="#keeperMenu" aria-label="Close"></button>
-      </div>
-      <div class="offcanvas-body">
-        <ul class="nav flex-column">${links}
-        </ul>
-      </div>
-    </aside>`;
 }
 
 // statTile('Hives', 3, 'hive-box') -> a number with a label (dashboard counts).
@@ -278,19 +292,23 @@ function statTile(label, value, iconName) {
     </div>`;
 }
 
-// The hat icon: hides or shows the menu column on large screens, opens the drawer on phones.
-// On a page with no menu it stays a normal link to the dashboard.
+// Account panel: close it after a link is picked, so jumps on the same page
+// (My Farms & Hives, My Listings) aren't hidden behind it
 document.addEventListener('click', event => {
-  const hat = event.target.closest('[data-keeper-menu-toggle]');
-  const layout = document.querySelector('.keeper-layout');
-  if (!hat || !layout) return;
+  const link = event.target.closest('#accountPanel a');
+  const panel = document.getElementById('accountPanel');
+  if (!link || !panel || typeof bootstrap === 'undefined') return;
 
-  event.preventDefault();
-  if (window.matchMedia('(min-width: 992px)').matches) {
-    layout.classList.toggle('menu-hidden');
-  } else {
-    bootstrap.Offcanvas.getOrCreateInstance('#keeperMenu').toggle();
+  // A section on this same page: wait for the panel to close (it locks scrolling while open), then jump
+  const url = new URL(link.href, location.href);
+  if (url.hash && url.pathname === location.pathname) {
+    event.preventDefault();
+    panel.addEventListener('hidden.bs.offcanvas', () => {
+      if (location.hash === url.hash) document.querySelector(url.hash)?.scrollIntoView();
+      else location.hash = url.hash;
+    }, { once: true });
   }
+  bootstrap.Offcanvas.getInstance(panel)?.hide();
 });
 
 // Quantity selector: makes the − / + buttons inside any .qty-stepper work.
@@ -333,17 +351,34 @@ function initSegTabs(bar) {
   return place;                               // call again if a tab's label changes
 }
 
+// Pretend sign-in until real login exists (HC-113). Sign in (js/signin.js) remembers
+// "keeper" in this browser so every page shows the beekeeper navbar, not just keeper pages.
+// Sign out goes to signin.html?signed-out, which forgets it.
+const HTSession = {
+  KEY: 'ht-signed-in-role',
+  role() {
+    try { return localStorage.getItem(this.KEY); } catch (error) { return null; }
+  },
+  signIn(role) {
+    try { localStorage.setItem(this.KEY, role); } catch (error) { /* storage blocked */ }
+  },
+  signOut() {
+    try { localStorage.removeItem(this.KEY); } catch (error) { /* storage blocked */ }
+  }
+};
+if (new URLSearchParams(location.search).has('signed-out')) HTSession.signOut();
+
 // Fill placeholders on the page:
 //   <div data-component="site-nav" data-active="map"></div>
-//   <div data-component="site-nav" data-role="keeper"></div>
-//   <div data-component="keeper-sidebar" data-active="dashboard"></div>
+//   <div data-component="site-nav" data-role="keeper" data-account-active="dashboard"></div>
 //   <div data-component="site-footer"></div>
 //   <span data-badge="certified"></span>
 document.querySelectorAll('[data-component="site-nav"]').forEach(el => {
-  el.outerHTML = siteNav(el.dataset.active, el.dataset.role);
-});
-document.querySelectorAll('[data-component="keeper-sidebar"]').forEach(el => {
-  el.innerHTML = keeperSidebar(el.dataset.active);
+  const role = el.dataset.role || HTSession.role();
+  const panel = role === 'keeper' || role === 'shopper'
+    ? accountPanel(role, el.dataset.accountActive || el.dataset.active)
+    : '';
+  el.outerHTML = siteNav(el.dataset.active, role) + panel;
 });
 document.querySelectorAll('[data-component="site-footer"]').forEach(el => {
   el.outerHTML = siteFooter();

@@ -1,0 +1,84 @@
+// Find your honey page (find-your-honey.html)
+
+.find-honey {
+  max-width: 760px;
+  padding-top: 3rem;
+  padding-bottom: 1rem;
+}
+
+.jar-label-sample {
+  width: 190px;
+  height: auto;
+}
+
+// The two "Shopping by type / place?" cards
+.path-card {
+  display: block;
+  height: 100%;
+  padding: 1.5rem;
+  background: #fff;
+  border: 1px solid rgba($primary, 0.3);
+  border-radius: $border-radius;
+  text-decoration: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $primary;
+    box-shadow: 0 0.25rem 0.75rem rgba($primary, 0.15);
+  }
+
+  &__ask {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: $text-muted;
+  }
+
+  &__dest {
+    display: block;
+    font-family: $headings-font-family;
+    font-size: 1.5rem;
+    color: $body-color;
+  }
+}
+
+.jar-label-sample--sm {
+  width: 110px;
+  flex-shrink: 0;
+}
+
+// Homepage pop-up
+.find-modal {
+  border: 0;
+  border-radius: 1rem;
+  background: $cream;
+
+  .modal-header {
+    border: 0;
+    padding: 1.5rem 1.5rem 0;
+  }
+
+  .modal-title {
+    font-size: 1.75rem;
+  }
+
+  .modal-body {
+    padding: .75rem 1.5rem 1rem;
+  }
+
+  .modal-footer {
+    justify-content: center;
+    gap: .5rem;
+    border-top: 1px solid $line;
+    padding: .9rem 1.5rem;
+
+    > * { margin: 0; }
+  }
+
+  &__help {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+}

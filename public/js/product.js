@@ -4,6 +4,8 @@
 //   product.html?id=4      a Marketplace listing
 //   product.html?batch=11  a QR label. If that batch isn't sold here, the buy box
 //                          becomes "Visit keeper's shop" (QR codes work anywhere a keeper sells).
+//   product.html?batch=12  a suspended keeper (mock data): the page still opens, but there's
+//                          no way to buy, no Certified badge, and a neutral notice instead.
 // Anything missing or unknown goes to the bee-pun No data found page.
 
 (function () {
@@ -27,12 +29,17 @@
     window.location.replace('not-found.html');
   }
 
+  // A suspended keeper's jars are still out in the world, so their trace page opens,
+  // but nothing on it can be bought (the server refuses those orders too).
+  const isSuspended = t => t.keeper?.certification === 'suspended';
+
   // ---- Top: breadcrumb, title, farm, badges ----
 
   function renderHead(t) {
     document.title = `${t.title} | Honey Tracker`;
 
-    fill('breadcrumb').innerHTML = t.listing
+    // No Marketplace breadcrumb when the honey isn't on the Marketplace
+    fill('breadcrumb').innerHTML = t.listing && !isSuspended(t)
       ? `<ol class="breadcrumb">
            <li class="breadcrumb-item"><a href="marketplace.html">Marketplace</a></li>
            <li class="breadcrumb-item active" aria-current="page">${escapeHtml(t.title)}</li>
@@ -50,7 +57,9 @@
       <span class="text-soft">&middot; ${escapeHtml(farm.county)} County, ${escapeHtml(farm.state)}</span>`;
 
     // Icon badges, each linking to its definition on the Learn page
-    fill('badges').innerHTML = (t.badges || []).filter(key => BADGES[key]).map(key => {
+    // The API already drops 'certified' for a suspended keeper; this is a second guard
+    const badges = (t.badges || []).filter(key => BADGES[key] && !(key === 'certified' && isSuspended(t)));
+    fill('badges').innerHTML = badges.map(key => {
       const b = BADGES[key];
       return `<a class="badge badge-${key} badge--icon" href="learn.html#${key}" data-bs-toggle="tooltip" data-bs-title="${b.label}">
         ${icon(b.icon, 'badge-icon')}<span class="visually-hidden">${b.label}</span></a>`;
@@ -165,12 +174,35 @@
     fill('made').innerHTML = `<dl class="trace-facts">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
   }
 
+  // ---- Suspended notice ----
+
+  // Neutral on purpose: a missed paperwork deadline and a failed test look the same here.
+  // Wording is a placeholder until Mr. Gallic says how he wants it worded.
+  function renderNotice(t) {
+    const notice = fill('notice');
+    if (!isSuspended(t)) return;
+    notice.innerHTML = `
+      <i class="bi bi-info-circle trace-notice__icon" aria-hidden="true"></i>
+      <div>
+        <p class="trace-notice__title">Certification currently under review</p>
+        <p class="trace-notice__text">Not for sale here right now.</p>
+      </div>`;
+    notice.hidden = false;
+  }
+
   // ---- Photo, buy box and phone bar ----
 
   function renderBuy(t) {
     fill('photo').innerHTML = t.photo
       ? `<img src="${escapeHtml(t.photo)}" alt="Jar of ${escapeHtml(t.title)}">`
       : `<i class="bi bi-image" aria-hidden="true"></i>`;
+
+    // Suspended: no buy box or phone bar at all (the notice above says why)
+    if (isSuspended(t)) {
+      fill('buy').classList.remove('d-lg-flex');
+      fill('bar').hidden = true;
+      return;
+    }
 
     const keeper = t.keeper;
     // Contact goes through the site later (keeper email and phone stay private), so it's off for now
@@ -245,6 +277,7 @@
     if (!t) return notFound();
 
     renderHead(t);
+    renderNotice(t);
     renderSteps(t);
     renderWhere(t);
     renderKeeper(t);

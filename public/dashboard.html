@@ -23,12 +23,11 @@
 <body>
 
   <!-- Navbar and footer are built by js/components.js (edit them there, once) -->
-  <div data-component="site-nav" data-role="keeper"></div>
+  <div data-component="site-nav" data-role="keeper" data-account-active="dashboard"></div>
 
   <!-- Beekeeper dashboard (wireframe 13). Stays hidden until js/dashboard.js has confirmed
        an approved keeper and filled it with that keeper's own records. -->
   <div class="container keeper-layout" id="keeperPage" hidden>
-    <div data-component="keeper-sidebar" data-active="dashboard"></div>
 
     <main class="keeper-main">
       <header class="dashboard-header">
@@ -36,8 +35,9 @@
         <div id="certification"></div>
       </header>
 
+      <!-- Suspended: listings are hidden, and new harvests and QR labels are paused (API contract, QR labels) -->
       <div class="alert alert-warning" id="suspendedNotice" role="alert" hidden>
-        Your certification is suspended. Your listings are hidden until it's resolved.
+        Your certification is under review. Until it's resolved, your listings are hidden and new harvests and labels are paused.
       </div>
 
       <!-- Shown instead of the dashboard when the keeper has no farms yet -->
@@ -54,7 +54,7 @@
         <div class="row g-4 mb-4">
           <section class="col-xl-7 dashboard-section" id="farms" aria-labelledby="farmsTitle">
             <div class="dashboard-section__head">
-              <h2 id="farmsTitle">My apiaries</h2>
+              <h2 id="farmsTitle">My farms &amp; hives</h2>
               <a class="btn btn-sm btn-outline-secondary" href="add-farm.html"><i class="bi bi-plus-lg" aria-hidden="true"></i> Add farm</a>
             </div>
             <div id="apiaryMap"></div>
@@ -63,7 +63,7 @@
           <section class="col-xl-5 dashboard-section" aria-labelledby="harvestsTitle">
             <div class="dashboard-section__head">
               <h2 id="harvestsTitle">Recent harvests</h2>
-              <a class="btn btn-sm btn-outline-secondary" href="log-harvest.html"><i class="bi bi-plus-lg" aria-hidden="true"></i> Log harvest</a>
+              <a class="btn btn-sm btn-outline-secondary" id="logHarvestButton" href="log-harvest.html"><i class="bi bi-plus-lg" aria-hidden="true"></i> Log harvest</a>
             </div>
             <ul class="dash-list" id="recentHarvests"></ul>
           </section>

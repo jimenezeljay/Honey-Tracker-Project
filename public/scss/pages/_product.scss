@@ -324,6 +324,36 @@
   .container.trace { max-width: 960px; }
 }
 
+// Suspended keeper notice (calm, not an error: sage, not red)
+.trace-notice {
+  display: flex;
+  gap: .75rem;
+  align-items: flex-start;
+  margin-top: 1.25rem;
+  padding: 1rem 1.25rem;
+  background: rgba($sage, .14);
+  border: 1px solid rgba($sage, .45);
+  border-radius: 1rem;
+
+  &[hidden] { display: none; }
+
+  &__icon {
+    font-size: 1.25rem;
+    line-height: 1.4;
+    color: #4F5C43;   // deep sage (same as the Raw badge icon)
+  }
+
+  &__title {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  &__text {
+    margin: 0;
+    color: $ink-soft;
+  }
+}
+
 .trace-buy {
   flex-direction: column;
   gap: .75rem;

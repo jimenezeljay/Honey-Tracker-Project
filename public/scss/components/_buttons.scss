@@ -63,3 +63,12 @@ $amber-edge:  #9A6B18;
   z-index: 1030;
   box-shadow: 0 4px 12px rgba($ink, .2);
 }
+
+// Outline buttons (Sign in, Account, Add farm, QR label...): Bootstrap's sage text was
+// too faint to read (3:1). Darker sage text, same sage border. 5:1 on white, 4.7:1 on cream.
+$sage-text: #647358;
+
+.btn-outline-secondary {
+  --bs-btn-color: #{$sage-text};
+  --bs-btn-disabled-color: #{$sage-text};
+}

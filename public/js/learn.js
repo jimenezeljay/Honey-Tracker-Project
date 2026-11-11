@@ -30,12 +30,23 @@ const PURITY_STEPS = [
   { title: 'Jar',   text: 'Each batch gets its own trace page and QR code, so you can follow your jar back to the hive it came from.' }
 ];
 
+// QR tracing tab: three short steps (count toward the 22-word first view).
+// Tapping a step shows its detail underneath, like the label tiles, so detail can run longer.
+const QR_STEPS = [
+  { icon: 'bi-journal-plus', title: 'Logged', text: 'A keeper logs the harvest.',
+    detail: 'After each harvest, the keeper records which hives it came from, when, and what was blooming nearby. That record becomes the batch\'s trace page.' },
+  { icon: 'bi-qr-code', title: 'Labeled', text: 'Each jar gets a QR label.',
+    detail: 'The site makes one QR label per batch, with a short code like HT-0011 printed under it. Keepers can use it anywhere they sell, even at a farmers market.' },
+  { icon: 'bi-phone', title: 'Scanned', text: 'Scan it to see the hive.',
+    detail: 'Point your phone\'s camera at the code; no app needed. It opens the trace page: where the hives are, what the bees foraged, and when it was jarred.' }
+];
+
 (function () {
   const tiles = document.getElementById('termTiles');
   const detail = document.getElementById('termDetail');
   if (!tiles || !detail) return;
 
-  const TAB_IDS = ['definitions', 'purity', 'deeper'];
+  const TAB_IDS = ['definitions', 'purity', 'qr-tracing', 'deeper'];
 
   // ---------- Build ----------
 
@@ -102,6 +113,29 @@ const PURITY_STEPS = [
           <span class="source-card__meta">${escapeHtml(s.publisher)}${s.date ? `, ${escapeHtml(s.date)}` : ''}</span>
         </a>
       </div>`).join('');
+  }
+
+  // ---------- QR tracing steps ----------
+
+  const qrSteps = document.getElementById('qrSteps');
+  const qrDetail = document.getElementById('qrDetail');
+  if (qrSteps && qrDetail) {
+    qrSteps.innerHTML = QR_STEPS.map((step, i) => `
+      <li class="purity-step">
+        <button type="button" class="term-tile qr-tile" data-step="${i}" aria-pressed="false" aria-controls="qrDetail">
+          <span class="qr-step__icon" aria-hidden="true"><i class="bi ${step.icon}"></i></span>
+          <span class="qr-tile__text">${escapeHtml(step.text)}</span>
+        </button>
+      </li>`).join('');
+
+    qrSteps.addEventListener('click', event => {
+      const btn = event.target.closest('.qr-tile');
+      if (!btn) return;
+      const step = QR_STEPS[Number(btn.dataset.step)];
+      qrSteps.querySelectorAll('.qr-tile').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+      qrDetail.innerHTML = `<span class="eyebrow">${escapeHtml(step.title)}</span><p>${escapeHtml(step.detail)}</p>`;
+      qrDetail.classList.remove('is-empty');
+    });
   }
 
   // ---------- Tabs and the URL hash ----------

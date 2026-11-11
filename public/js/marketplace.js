@@ -19,6 +19,10 @@
     max: document.getElementById('priceMax'),
     season: document.getElementById('seasonSelect'),
     sort: document.getElementById('sortSelect'),
+    search: document.getElementById('searchInput'),
+    sortLabel: document.getElementById('sortLabel'),
+    sortItems: document.querySelectorAll('[data-sort]'),
+    chips: document.getElementById('filterChips'),
     count: document.getElementById('resultCount'),
     filterCount: document.getElementById('filterCount'),
     showResults: document.getElementById('showResults'),
@@ -79,6 +83,7 @@
       min: number('min'),
       max: number('max'),
       season: data.get('season') || '',
+      q: (data.get('q') || '').trim().toLowerCase(),
       sort: data.get('sort') || 'nearest'
     };
   }
@@ -94,6 +99,7 @@
     setSelect(el.state, params.get('state'));
     setSelect(el.season, params.get('season'));
     setSelect(el.sort, params.get('sort'));
+    el.search.value = params.get('q') || '';
     el.verified.checked = params.get('verified') === '1';
     el.min.value = params.get('min') || '';
     el.max.value = params.get('max') || '';
@@ -106,6 +112,7 @@
   // Keep the URL in step with the form, leaving out empty filters and the default sort
   function writeUrl(f) {
     const params = new URLSearchParams();
+    if (f.q) params.set('q', f.q);
     if (f.type) params.set('type', f.type);
     if (f.texture) params.set('texture', f.texture);
     if (f.verified) params.set('verified', '1');
@@ -140,6 +147,11 @@
     if (f.min !== null && listing.price < f.min) return false;
     if (f.max !== null && listing.price > f.max) return false;
     if (f.season && listing.season !== f.season) return false;
+    if (f.q) {
+      // Every word has to appear somewhere: "clover sunrise" finds clover from Sunrise Farm
+      const text = [listing.title, listing.honeyType, listing.farmName, listing.state, listing.texture].join(' ').toLowerCase();
+      if (!f.q.split(/\s+/).every(word => text.includes(word))) return false;
+    }
     return true;
   }
 
@@ -154,6 +166,49 @@
     return [f.type, f.texture, f.verified, f.state, f.min !== null, f.max !== null, f.season].filter(Boolean).length + f.badges.length;
   }
 
+  // ---------- Sort menu and filter chips ----------
+
+  const SORT_LABELS = { nearest: 'Nearest', price: 'Lowest price', newest: 'Newest' };
+
+  function renderSort(sort) {
+    el.sortLabel.textContent = SORT_LABELS[sort] || SORT_LABELS.nearest;
+    el.sortItems.forEach(item => {
+      const on = item.dataset.sort === sort;
+      item.classList.toggle('active', on);
+      item.setAttribute('aria-current', on ? 'true' : 'false');
+    });
+  }
+
+  // One chip per active filter; the x clears just that one
+  function renderChips(f) {
+    const money = n => `$${n}`;
+    const chips = [];
+    if (f.type) chips.push({ label: f.type, clear: () => { el.type.value = ''; } });
+    if (f.texture) chips.push({ label: f.texture[0].toUpperCase() + f.texture.slice(1), clear: () => { el.texture.value = ''; } });
+    if (f.verified) chips.push({ label: 'Volunteer-Verified', clear: () => { el.verified.checked = false; } });
+    f.badges.forEach(key => chips.push({ label: BADGES[key]?.label || key, clear: () => { document.getElementById(`badge-${key}`).checked = false; } }));
+    if (f.state) chips.push({ label: f.state, clear: () => { el.state.value = ''; } });
+    if (f.min !== null || f.max !== null) {
+      const label = f.min !== null && f.max !== null ? `${money(f.min)}–${money(f.max)}`
+        : f.min !== null ? `${money(f.min)} and up` : `Up to ${money(f.max)}`;
+      chips.push({ label, clear: () => { el.min.value = ''; el.max.value = ''; } });
+    }
+    if (f.season) chips.push({ label: f.season, clear: () => { el.season.value = ''; } });
+
+    el.chips.hidden = chips.length === 0;
+    el.chips.innerHTML = chips.map((chip, i) =>
+      `<button type="button" class="filter-chip" data-chip="${i}" aria-label="Remove filter: ${escapeHtml(chip.label)}">${escapeHtml(chip.label)} <i class="bi bi-x-lg" aria-hidden="true"></i></button>`
+    ).join('') + (chips.length > 1 ? '<button type="button" class="btn btn-link btn-sm p-0" data-chip="all">Clear all</button>' : '');
+    el.chips.onclick = event => {
+      const target = event.target.closest('[data-chip]');
+      if (!target) return;
+      if (target.dataset.chip === 'all') return form.reset();
+      chips[Number(target.dataset.chip)].clear();
+      render();
+      el.chips.querySelector('.filter-chip')?.focus() || el.search.focus(); // keep focus near the chips
+    };
+  }
+
   // ---------- Render ----------
 
   function render() {
@@ -162,7 +217,7 @@
 
     disposeTooltips(grid);
     grid.innerHTML = results
-      .map(listing => `<div class="col-sm-6 col-xl-4">${productCard(listing)}</div>`)
+      .map(listing => `<div class="col-sm-6 col-lg-4 col-xl-3">${productCard(listing)}</div>`)
       .join('');
 
     const label = `${results.length} ${results.length === 1 ? 'honey' : 'honeys'}`;
@@ -173,6 +228,9 @@
     const active = activeFilterCount(f);
     el.filterCount.textContent = active;
     el.filterCount.classList.toggle('d-none', active === 0);
+
+    renderSort(f.sort);
+    renderChips(f);
 
     el.nearNote.hidden = f.sort !== 'nearest';
     el.nearPlace.textContent = origin.label;
@@ -186,6 +244,11 @@
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   el.sort.addEventListener('change', render); // lives outside the form element (form="filterForm")
+  el.search.addEventListener('input', render);
+  el.sortItems.forEach(item => item.addEventListener('click', () => {
+    el.sort.value = item.dataset.sort;
+    render();
+  })); // same: sits in the header, joined to the form by form="filterForm"
   form.addEventListener('submit', event => event.preventDefault());
   // "reset" fires before the fields clear, so render on the next tick
   form.addEventListener('reset', () => setTimeout(render));
