@@ -169,41 +169,7 @@ const QR_STEPS = [
   window.addEventListener('hashchange', applyHash);
   applyHash();
 
-  // ---- TEMPORARY: how the definition bar starts (bottom left switch) ----
-  // "Certified" opens on Certified; "Hint" shows a tap-a-label line. Either way the bar is
-  // always there, so the tiles don't jump. ?learnstart=hint also works.
-  // Delete this block and .learn-start-switch once one is picked; keep only the winner.
-  function startBar(mode) {
-    if (tiles.querySelector('[aria-pressed="true"]') && detail.dataset.start !== 'auto') return;
-    if (mode === 'hint') {
-      tiles.querySelectorAll('.term-tile').forEach(btn => btn.setAttribute('aria-pressed', 'false'));
-      detail.innerHTML = '<p class="term-detail__hint">Tap a label below to see what it means.</p>';
-      detail.classList.remove('is-empty');
-    } else {
-      selectTerm('certified', false);
-    }
-    detail.dataset.start = 'auto';
-  }
-  tiles.addEventListener('click', () => { delete detail.dataset.start; });
-
-  let startMode = new URLSearchParams(window.location.search).get('learnstart') === 'hint' ? 'hint' : 'certified';
-  const startSwitch = document.createElement('div');
-  startSwitch.className = 'learn-start-switch btn-group btn-group-sm';
-  startSwitch.setAttribute('role', 'group');
-  startSwitch.setAttribute('aria-label', 'Definition bar preview');
-  startSwitch.innerHTML = ['certified', 'hint'].map(mode =>
-    `<button type="button" class="btn btn-light" data-start="${mode}">${mode === 'hint' ? 'Hint' : 'Certified'}</button>`).join('');
-  document.body.appendChild(startSwitch);
-  function setStart(mode) {
-    startMode = mode;
-    startSwitch.querySelectorAll('button').forEach(btn => btn.setAttribute('aria-pressed', String(btn.dataset.start === mode)));
-    detail.dataset.start = 'auto';
-    startBar(mode);
-  }
-  startSwitch.addEventListener('click', event => {
-    const btn = event.target.closest('[data-start]');
-    if (btn) setStart(btn.dataset.start);
-  });
-  startSwitch.querySelectorAll('button').forEach(btn => btn.setAttribute('aria-pressed', String(btn.dataset.start === startMode)));
-  startBar(startMode);
+  // The definition bar always shows (it sits above the tiles), so start on Certified
+  // unless the URL already picked a label. Keeps the tiles from jumping on first tap.
+  if (!tiles.querySelector('[aria-pressed="true"]')) selectTerm('certified', false);
 })();
