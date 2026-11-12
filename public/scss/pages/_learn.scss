@@ -260,3 +260,15 @@ $liquid-gold:  #C98A12;  // Liquid icon
   font-size: .875rem;
   color: $ink-soft;
 }
+
+.term-detail__hint { margin: 0; color: rgba($ink, .6); font-style: italic; }
+
+// TEMPORARY: definition bar start switch (js/learn.js). Delete once one is picked.
+.learn-start-switch {
+  position: fixed;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 1030;
+  box-shadow: 0 2px 8px rgba($ink, .2);
+  .btn[aria-pressed="true"] { background: $amber; border-color: $amber; }
+}
