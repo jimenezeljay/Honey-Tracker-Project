@@ -60,6 +60,8 @@
 
   .key-pin { width: .75rem; height: .75rem; border-radius: 50%; background: $amber; }
   .key-area { width: 1rem; height: 1rem; border-radius: 50%; background: rgba($amber, .18); border: 2px dashed $amber; }
+  // "Locations may not be exact" (Nov 12)
+  .map-legend__note { font-size: .8rem; font-style: italic; color: rgba($ink, .7); }
   .key-radius { width: 1rem; height: 1rem; border-radius: 50%; background: rgba($sage, .18); border: 2px solid rgba($sage, .7); }
 }
 
@@ -76,7 +78,7 @@
   .leaflet-tooltip { font-weight: 600; color: $ink; }
 }
 
-// Exact hive pin (same look as the old placeholder .map-pin)
+// Hive dot (same look as the old placeholder .map-pin)
 .ht-pin {
   border-radius: 50%;
   background: $amber;
@@ -84,16 +86,8 @@
   box-shadow: 0 1px 4px rgba($ink, .35);
 }
 
-// Approximate farm, zoomed out: dashed ring (same look as the legend's key-area)
-.ht-area {
-  border-radius: 50%;
-  background: rgba($amber, .18);
-  border: 2px dashed $amber;
-}
-
 // Keyboard focus on a pin
-.leaflet-marker-icon.ht-pin:focus-visible,
-.leaflet-marker-icon.ht-area:focus-visible {
+.leaflet-marker-icon.ht-pin:focus-visible {
   outline: 3px solid $ink;
   outline-offset: 2px;
 }
