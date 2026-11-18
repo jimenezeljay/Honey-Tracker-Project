@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Checkout | Honey Tracker</title>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Compiled CSS (already includes Bootstrap) -->
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <!-- Navbar and footer are built by js/components.js (edit them there, once) -->
+  <div data-component="site-nav" data-active="cart"></div>
+
+  <!-- Wireframe 7: Checkout (HC-63). One page: contact, delivery per keeper, address, payment,
+       with the order summary on the right like Cart. Built by js/checkout.js.
+       Payment is Stripe in TEST MODE only (STRIPE_PUBLISHABLE_KEY in js/data.js); placeOrder()
+       in data.js is pretend until the backend has POST /api/orders. -->
+  <main class="container cart checkout" id="checkoutPage" aria-busy="true">
+    <header class="page-head">
+      <h1 class="mb-1">Checkout</h1>
+      <p class="text-soft mb-0"><span class="badge text-bg-light border">Test mode</span> No card is charged.</p>
+    </header>
+
+    <div class="alert alert-warning" id="checkoutSkipped" role="status" hidden></div>
+
+    <form id="checkoutForm" novalidate hidden>
+      <div class="cart-layout">
+        <div class="checkout-sections">
+
+          <section class="checkout-section" aria-labelledby="contactTitle">
+            <h2 class="checkout-section__title" id="contactTitle">Contact</h2>
+            <div class="row g-3">
+              <div class="col-sm-7">
+                <label class="form-label" for="email">Email</label>
+                <input class="form-control" type="email" id="email" name="email" autocomplete="email" required>
+                <div class="invalid-feedback">Enter your email.</div>
+              </div>
+              <div class="col-sm-5">
+                <label class="form-label" for="phone">Phone <span class="text-soft">(optional)</span></label>
+                <input class="form-control" type="tel" id="phone" name="phone" autocomplete="tel">
+              </div>
+            </div>
+          </section>
+
+          <section class="checkout-section" aria-labelledby="deliveryTitle">
+            <h2 class="checkout-section__title" id="deliveryTitle">Delivery</h2>
+            <div class="checkout-keepers" id="checkoutKeepers"></div>
+          </section>
+
+          <section class="checkout-section" id="addressSection" aria-labelledby="addressTitle">
+            <h2 class="checkout-section__title" id="addressTitle">Shipping address</h2>
+            <!-- Disabled (and skipped by validation) when every keeper is set to pickup -->
+            <fieldset id="addressFields">
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label" for="fullName">Full name</label>
+                  <input class="form-control" id="fullName" name="fullName" autocomplete="shipping name" required>
+                  <div class="invalid-feedback">Enter a name.</div>
+                </div>
+                <div class="col-sm-8">
+                  <label class="form-label" for="line1">Address</label>
+                  <input class="form-control" id="line1" name="line1" autocomplete="shipping address-line1" required>
+                  <div class="invalid-feedback">Enter a street address.</div>
+                </div>
+                <div class="col-sm-4">
+                  <label class="form-label" for="line2">Apt <span class="text-soft">(optional)</span></label>
+                  <input class="form-control" id="line2" name="line2" autocomplete="shipping address-line2">
+                </div>
+                <div class="col-sm-5">
+                  <label class="form-label" for="city">City</label>
+                  <input class="form-control" id="city" name="city" autocomplete="shipping address-level2" required>
+                  <div class="invalid-feedback">Enter a city.</div>
+                </div>
+                <div class="col-sm-4">
+                  <label class="form-label" for="state">State</label>
+                  <select class="form-select" id="state" name="state" autocomplete="shipping address-level1" required>
+                    <option value="" selected disabled>Choose…</option>
+                    <option value="AL">Alabama</option>
+                    <option value="AK">Alaska</option>
+                    <option value="AZ">Arizona</option>
+                    <option value="AR">Arkansas</option>
+                    <option value="CA">California</option>
+                    <option value="CO">Colorado</option>
+                    <option value="CT">Connecticut</option>
+                    <option value="DE">Delaware</option>
+                    <option value="DC">District of Columbia</option>
+                    <option value="FL">Florida</option>
+                    <option value="GA">Georgia</option>
+                    <option value="HI">Hawaii</option>
+                    <option value="ID">Idaho</option>
+                    <option value="IL">Illinois</option>
+                    <option value="IN">Indiana</option>
+                    <option value="IA">Iowa</option>
+                    <option value="KS">Kansas</option>
+                    <option value="KY">Kentucky</option>
+                    <option value="LA">Louisiana</option>
+                    <option value="ME">Maine</option>
+                    <option value="MD">Maryland</option>
+                    <option value="MA">Massachusetts</option>
+                    <option value="MI">Michigan</option>
+                    <option value="MN">Minnesota</option>
+                    <option value="MS">Mississippi</option>
+                    <option value="MO">Missouri</option>
+                    <option value="MT">Montana</option>
+                    <option value="NE">Nebraska</option>
+                    <option value="NV">Nevada</option>
+                    <option value="NH">New Hampshire</option>
+                    <option value="NJ">New Jersey</option>
+                    <option value="NM">New Mexico</option>
+                    <option value="NY">New York</option>
+                    <option value="NC">North Carolina</option>
+                    <option value="ND">North Dakota</option>
+                    <option value="OH">Ohio</option>
+                    <option value="OK">Oklahoma</option>
+                    <option value="OR">Oregon</option>
+                    <option value="PA">Pennsylvania</option>
+                    <option value="RI">Rhode Island</option>
+                    <option value="SC">South Carolina</option>
+                    <option value="SD">South Dakota</option>
+                    <option value="TN">Tennessee</option>
+                    <option value="TX">Texas</option>
+                    <option value="UT">Utah</option>
+                    <option value="VT">Vermont</option>
+                    <option value="VA">Virginia</option>
+                    <option value="WA">Washington</option>
+                    <option value="WV">West Virginia</option>
+                    <option value="WI">Wisconsin</option>
+                    <option value="WY">Wyoming</option>
+                  </select>
+                  <div class="invalid-feedback">Choose a state.</div>
+                </div>
+                <div class="col-sm-3">
+                  <label class="form-label" for="zip">ZIP</label>
+                  <input class="form-control" id="zip" name="zip" inputmode="numeric" autocomplete="shipping postal-code" pattern="\d{5}(-\d{4})?" required>
+                  <div class="invalid-feedback">Enter a 5-digit ZIP.</div>
+                </div>
+              </div>
+            </fieldset>
+          </section>
+
+          <section class="checkout-section" aria-labelledby="paymentTitle">
+            <h2 class="checkout-section__title" id="paymentTitle">Payment</h2>
+            <!-- Stripe's card form is mounted here (it runs in Stripe's own frame; card numbers never touch our code) -->
+            <div id="paymentElement"></div>
+            <p class="cart-note mb-0" id="paymentSetup" hidden>Card payments aren't set up yet.</p>
+            <p class="cart-note mb-0 mt-2" id="paymentTestCard" hidden>Test card: 4242 4242 4242 4242, any future date and CVC.</p>
+            <div class="invalid-feedback d-block" id="paymentError" role="alert"></div>
+          </section>
+        </div>
+
+        <aside class="cart-summary" aria-labelledby="summaryTitle">
+          <h2 class="cart-summary__title" id="summaryTitle">Order summary</h2>
+          <dl class="cart-summary__rows" id="summaryRows"></dl>
+          <button class="btn btn-primary cart-summary__checkout" type="submit" id="placeOrder">Place order</button>
+          <a class="cart-summary__note text-center" href="cart.html">Back to cart</a>
+        </aside>
+      </div>
+    </form>
+
+    <!-- Nothing to buy -->
+    <div class="cart-empty" id="checkoutEmpty" hidden>
+      <span class="cart-empty__icon" aria-hidden="true"><i class="bi bi-bag"></i></span>
+      <h2 class="cart-empty__title">Nothing to check out.</h2>
+      <a class="btn btn-primary" href="marketplace.html">Browse the Marketplace</a>
+    </div>
+
+    <!-- After a (test) order -->
+    <div class="cart-empty" id="checkoutDone" tabindex="-1" hidden>
+      <span class="cart-empty__icon" aria-hidden="true"><i class="bi bi-check2-circle"></i></span>
+      <h2 class="cart-empty__title">Order placed.</h2>
+      <p class="text-soft mb-1">Test order <strong id="orderId"></strong>. Each keeper emails you next.</p>
+      <a class="btn btn-primary mt-3" href="marketplace.html">Keep browsing</a>
+    </div>
+  </main>
+
+  <div data-component="site-footer"></div>
+
+  <!-- Shared navbar + footer first (local file, so they appear without waiting on the CDN) -->
+  <script src="js/components.js"></script>
+  <!-- Bootstrap JS. Goes at the end of body -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Stripe.js must load from js.stripe.com (Stripe doesn't allow self-hosting it) -->
+  <script src="https://js.stripe.com/v3/"></script>
+  <!-- Your JS -->
+  <script src="js/main.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/forms.js"></script>
+  <script src="js/checkout.js"></script>
+</body>
+</html>

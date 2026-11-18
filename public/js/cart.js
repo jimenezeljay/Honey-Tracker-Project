@@ -9,11 +9,7 @@
   const page = document.getElementById('cartPage');
   if (!page) return;
 
-  // Estimated service fee: Mr. Gallic's "$1 + credit card fee", using Stripe's standard
-  // US card rate (2.9% + 30¢), charged once per order. Not final until Jira HC-110 is answered.
-  const FEE_FLAT_CENTS = 100;
-  const CARD_RATE = 0.029;
-  const CARD_FIXED_CENTS = 30;
+  // Estimated service fee: estimateServiceFeeCents() in data.js (shared with Checkout).
   const MAX_QTY = 10;
   const LOW_STOCK = 5;
 
@@ -35,6 +31,11 @@
   const cents = dollars => Math.round(Number(dollars) * 100);
   const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
   const maxFor = listing => Math.min(Math.max(listing.stock, 0), MAX_QTY);
+  // Honey from a suspended keeper stays in the cart but can't be bought (same rule as the trace page).
+  // isSuspended() is in data.js; the wording matches the trace page's neutral notice.
+  const unavailable = listing => listing.stock <= 0 || isSuspended(listing.keeper);
+  const unavailableLabel = listing => (listing.stock <= 0 ? 'Sold out' : 'Unavailable');
+  const UNDER_REVIEW = 'Certification currently under review';
 
   // Listings are looked up once and reused as the cart changes
   const listings = new Map();
@@ -59,7 +60,8 @@
   // ---- Cart tab ----
 
   function cartLine(line, listing) {
-    const soldOut = listing.stock <= 0;
+    const soldOut = unavailable(listing);
+    const review = isSuspended(listing.keeper) ? ` &middot; ${UNDER_REVIEW}` : '';
     const max = maxFor(listing);
     const qty = Math.min(line.qty, max);
     const low = !soldOut && listing.stock <= LOW_STOCK ? ` &middot; Only ${listing.stock} left` : '';
@@ -70,14 +72,14 @@
         ${photo(listing)}
         <div class="cart-line__info">
           <a class="cart-line__title" href="product.html?id=${listing.id}">${name}</a>
-          <span class="cart-line__meta">${escapeHtml(listing.season)} batch &middot; ${Number(listing.jarOz)} oz${low}</span>
+          <span class="cart-line__meta">${escapeHtml(listing.season)} batch &middot; ${Number(listing.jarOz)} oz${low}${review}</span>
           <span class="cart-line__actions">
             ${soldOut ? '' : `<button type="button" class="link-button" data-action="save" data-id="${listing.id}">Save for later</button>`}
             <button type="button" class="link-button" data-action="remove" data-id="${listing.id}">Remove<span class="visually-hidden"> ${name}</span></button>
           </span>
         </div>
         ${soldOut
-          ? '<span class="cart-line__sold-out">Sold out</span>'
+          ? `<span class="cart-line__sold-out">${unavailableLabel(listing)}</span>`
           : `<div class="input-group qty-stepper cart-line__qty">
                <button class="btn btn-outline-secondary" type="button" data-qty="down" aria-label="Decrease quantity of ${name}">&minus;</button>
                <input class="form-control" type="number" value="${qty}" min="1" max="${max}" data-id="${listing.id}" aria-label="Quantity of ${name}">
@@ -108,7 +110,7 @@
       let groupHoney = 0;
       groupLines.forEach(line => {
         const listing = listings.get(line.listingId);
-        if (listing.stock <= 0) return;
+        if (unavailable(listing)) return;
         const qty = Math.min(line.qty, maxFor(listing));
         groupHoney += cents(listing.price) * qty;
         jars += qty;
@@ -141,9 +143,7 @@
 
     // Summary
     const beforeFee = honeyCents + shippingCents;
-    const feeCents = honeyCents > 0
-      ? FEE_FLAT_CENTS + Math.round(beforeFee * CARD_RATE) + CARD_FIXED_CENTS
-      : 0;
+    const feeCents = honeyCents > 0 ? estimateServiceFeeCents(beforeFee) : 0;
     const totalCents = beforeFee + feeCents;
 
     el.rows.innerHTML = `
@@ -175,7 +175,7 @@
 
     el.savedList.innerHTML = ids.map(id => {
       const listing = listings.get(id);
-      const soldOut = listing.stock <= 0;
+      const soldOut = unavailable(listing);
       const low = !soldOut && listing.stock <= LOW_STOCK ? ` &middot; Only ${listing.stock} left` : '';
       const name = escapeHtml(listing.title);
       return `
@@ -188,7 +188,7 @@
           <span class="cart-line__price">${money(cents(listing.price))}</span>
           <span class="saved-line__actions">
             ${soldOut
-              ? '<span class="cart-line__sold-out">Sold out</span>'
+              ? `<span class="cart-line__sold-out">${unavailableLabel(listing)}</span>`
               : `<button type="button" class="btn btn-outline-secondary" data-action="to-cart" data-id="${listing.id}">Move to cart</button>`}
             <button type="button" class="link-button" data-action="unsave" data-id="${listing.id}">Remove<span class="visually-hidden"> ${name}</span></button>
           </span>

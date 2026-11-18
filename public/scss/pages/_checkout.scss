@@ -1,0 +1,53 @@
+// Checkout (wireframe 7, HC-63). Built by js/checkout.js.
+// Reuses the Cart layout and summary (.cart-layout, .cart-summary, pages/_cart.scss)
+// and the sign-up choice cards (.role-card) for Ship / Pickup.
+
+.checkout .page-head { margin-bottom: 1.5rem; }
+
+.checkout-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.checkout-section {
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid $line;
+  border-radius: 1rem;
+
+  &[hidden] { display: none; }
+}
+
+.checkout-section__title {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+// One keeper: farm name, then Ship / Pickup cards
+.checkout-keepers {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.checkout-keeper__head {
+  float: none;
+  width: 100%;
+  font-size: 1rem;
+  margin-bottom: .6rem;
+}
+
+// Smaller version of the sign-up cards
+.delivery-card {
+  padding: .9rem 1rem;
+  gap: .2rem;
+  font-size: .9rem;
+}
+
+.delivery-card__title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: $ink;
+}
