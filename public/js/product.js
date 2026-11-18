@@ -114,8 +114,8 @@
         <a class="trace-map__link" href="map.html?farm=${encodeURIComponent(farm.id)}">Open in map</a>
       </div>
       <div class="trace-where__info">
-        <h3 class="trace-label">Pollen</h3>
-        <ul class="pollen-list">${pollen}</ul>
+        ${pollen ? `<h3 class="trace-label">Pollen</h3>
+        <ul class="pollen-list">${pollen}</ul>` : ''}
         <h3 class="trace-label">Nearby blooms</h3>
         <ul class="trace-chips">${flowers}</ul>
         <p class="trace-note">Not medical advice.</p>

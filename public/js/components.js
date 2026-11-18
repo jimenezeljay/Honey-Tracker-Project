@@ -270,12 +270,12 @@ function siteFooter() {
       <div class="container py-4 d-flex flex-wrap gap-3 justify-content-between">
         <span>&copy; ${new Date().getFullYear()} Honey Tracker</span>
         <nav class="d-flex flex-wrap gap-3" aria-label="Footer">
-          <a href="#">About</a>
+          <span class="soon-link" aria-disabled="true">About <span class="soon-tag">Soon</span></span>
           <a href="learn.html">Learn</a>
           <a href="find-your-honey.html">Trace a jar</a>
           <a href="get-started.html?role=keeper">Become a keeper</a>
           <a href="volunteer.html">Volunteer</a>
-          <a href="#">Contact</a>
+          <span class="soon-link" aria-disabled="true">Contact <span class="soon-tag">Soon</span></span>
         </nav>
       </div>
     </footer>`;
