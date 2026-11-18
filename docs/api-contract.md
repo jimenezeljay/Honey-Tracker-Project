@@ -284,13 +284,38 @@ The server must check that every hive belongs to the signed-in keeper, and shoul
 
 ---
 
+## Checkout (built on the frontend, test mode)
+
+### `POST /api/orders` (Checkout, HC-63)
+
+Checkout uses Stripe's Payment Element in **test mode**. The browser never sees card numbers: it asks Stripe for a ConfirmationToken and sends its id. `placeOrder(order)` in `data.js` is pretend until this endpoint exists.
+
+```json
+{
+  "contact": { "email": "shopper@example.com", "phone": null },
+  "shippingAddress": { "name": "Pat Shopper", "line1": "1 Main St", "line2": "", "city": "Steubenville", "state": "OH", "zip": "43952" },
+  "keepers": [
+    { "keeperId": 1, "farmId": 1, "delivery": "ship",   "lines": [{ "listingId": 1, "qty": 2 }] },
+    { "keeperId": 3, "farmId": 3, "delivery": "pickup", "lines": [{ "listingId": 5, "qty": 1 }] }
+  ],
+  "estimate": { "honeyCents": 4600, "shippingCents": 600, "serviceFeeCents": 281, "totalCents": 5481 },
+  "payment": { "provider": "stripe", "confirmationTokenId": "ctoken_..." }
+}
+```
+
+- `shippingAddress` is `null` when every keeper is set to pickup.
+- **The server works out the real total.** Re-check every price, stock level, keeper status (no suspended keepers) and whether each keeper offers the chosen delivery. `estimate` is only what the shopper saw.
+- Then create and confirm a Stripe PaymentIntent server-side with the secret key: `amount` = your total in cents, `currency: "usd"`, `confirm: true`, `confirmation_token: payment.confirmationTokenId`. If Stripe answers `requires_action`, return its `client_secret` so the page can finish 3-D Secure.
+- Reply: `{ "orderId": "...", "status": "paid" }`, or `409` with a message if stock or a price changed.
+- Service fee: $1 + card fee (2.9% + 30¢), estimated in `estimateServiceFeeCents()` in `data.js`. Final rule is Jira HC-110.
+
 ## Coming next (not built on the frontend yet)
 
 These pages will need endpoints that **write** data. We'll add shapes here as each page is built.
 
 | Feature | Likely endpoint | Ticket |
 |---|---|---|
-| Checkout / place an order | `POST /api/orders` (with Stripe or Square) | HC-63, HC-109, HC-119 |
+| Checkout / place an order | `POST /api/orders` (Stripe) — frontend built, see Checkout above | HC-63, HC-109, HC-119 |
 | Sign up, sign in, sign out, reset password | `POST /api/auth/...` | HC-113 |
 | Beekeeper application | `POST /api/keeper/application` | |
 | Edit my application | `PUT /api/keeper/application` | HC-124 |
