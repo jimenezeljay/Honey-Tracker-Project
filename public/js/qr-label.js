@@ -1,18 +1,101 @@
-// QR label page (wireframe 16). DRAFT: one label on plain paper, a Print button and a copy-link button.
+// QR label page (wireframe 16, HC-70). One label on plain paper, or a page of labels:
+// how many to print, and which spot to start at on a half-used sheet. Plus a copy-link button.
 // Needs js/components.js, the qrcode-generator library, and js/data.js (getKeeperDashboard, qrLink, batchCode).
 //
-//   qr-label.html?batch=1          a label for one of the signed-in keeper's batches
-//   qr-label.html                  no batch given: their most recent harvest
-//   qr-label.html?state=suspended  (mock) what a suspended keeper sees
-//
-// Later (QR labels section of the API contract): how many labels, which paper or sticker sheet,
-// and a start position for half-used sheets.
+//   qr-label.html?batch=1                              a label for one of the signed-in keeper's batches
+//   qr-label.html                                      no batch given: their most recent harvest
+//   qr-label.html?batch=1&sheet=letter9&count=12&start=4   12 labels, starting at spot 4
+//   qr-label.html?state=suspended                      (mock) what a suspended keeper sees
 
 (function () {
   const fill = name => document.querySelector(`[data-fill="${name}"]`);
   const picker = document.getElementById('batchPick');
   const copyButton = document.getElementById('copyLink');
   let batch = null;
+
+  // Print layouts. The cells' sizes are set in scss/pages/_qr-label.scss (.qr-sheet--<key>).
+  // To add a sticker sheet once the team picks one: add an entry here and a matching
+  // .qr-sheet--<key> rule, measured from the sheet maker's own template.
+  const SHEETS = {
+    single:  { name: 'One label (plain paper)', perPage: 1, cols: 1 },
+    letter9: { name: 'Letter page, 9 labels to cut out', perPage: 9, cols: 3 }
+  };
+  const MAX_LABELS = 90;   // 10 pages of 9
+
+  const sheet = {
+    pick: document.getElementById('sheetPick'),
+    options: document.getElementById('sheetOptions'),
+    count: document.getElementById('labelCount'),
+    start: document.getElementById('startSpot'),
+    map: document.getElementById('sheetMap'),
+    summary: document.getElementById('sheetSummary'),
+    printText: document.getElementById('printText')
+  };
+
+  // What prints, built from the preview label. Only shown when printing a page of labels.
+  const printSheets = document.createElement('div');
+  printSheets.className = 'qr-sheets';
+  printSheets.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(printSheets);
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, Math.round(Number(value)) || min));
+  const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+  function sheetChoice() {
+    const key = sheet.pick.value;
+    const layout = SHEETS[key];
+    const count = key === 'single' ? 1 : clamp(sheet.count.value, 1, MAX_LABELS);
+    const start = key === 'single' ? 1 : clamp(sheet.start.value, 1, layout.perPage);
+    return { key, layout, count, start };
+  }
+
+  // Keeps the batch and the print settings in the address, so a set-up page can be reopened
+  function updateUrl() {
+    const { key, count, start } = sheetChoice();
+    const params = new URLSearchParams({ batch: batch.id });
+    if (key !== 'single') {
+      params.set('sheet', key);
+      params.set('count', count);
+      params.set('start', start);
+    }
+    history.replaceState(null, '', `?${params}`);
+  }
+
+  function updateSheets() {
+    const { key, layout, count, start } = sheetChoice();
+    const many = key !== 'single';
+    document.body.classList.toggle('qr-print-sheet', many);
+    sheet.options.hidden = !many;
+    sheet.printText.textContent = many ? `Print ${plural(count, 'label')}` : 'Print label';
+    if (!many) {
+      printSheets.innerHTML = '';
+      return;
+    }
+
+    // Spots before `start` on the first page are skipped (already used); labels fill the rest in order
+    const spots = start - 1 + count;
+    const pages = Math.ceil(spots / layout.perPage);
+    const label = `<div class="qr-label">${document.getElementById('qrLabel').innerHTML}</div>`;
+    let html = '';
+    for (let page = 0; page < pages; page++) {
+      let cells = '';
+      for (let spot = 0; spot < layout.perPage; spot++) {
+        const n = page * layout.perPage + spot;
+        cells += n >= start - 1 && n < spots ? `<div class="qr-sheet__spot">${label}</div>` : '<div class="qr-sheet__spot is-empty"></div>';
+      }
+      html += `<div class="qr-sheet qr-sheet--${key}">${cells}</div>`;
+    }
+    printSheets.innerHTML = html;
+
+    // On-screen map of the first page: used spots, labels, and spots left blank
+    sheet.map.style.setProperty('--cols', layout.cols);
+    sheet.map.innerHTML = Array.from({ length: layout.perPage }, (_, spot) => {
+      const state = spot < start - 1 ? 'is-used' : spot < spots ? 'is-label' : '';
+      return `<span class="qr-sheet-map__spot ${state}"></span>`;
+    }).join('');
+    sheet.summary.textContent =
+      `${plural(count, 'label')} on ${plural(pages, 'page')}${start > 1 ? `, starting at spot ${start}` : ''}. Print on Letter paper at 100%.`;
+  }
 
   // The QR as one SVG path in the site's ink color, with the standard 4-module quiet zone
   function qrSvg(text) {
@@ -46,6 +129,7 @@
     fill('code').textContent = batchCode(batch);
     fill('honey').textContent = `${batch.honeyType} · ${batch.season}`;
     document.title = `QR label ${batchCode(batch)} · Honey Tracker`;
+    updateSheets();   // the printed page copies this label
   }
 
   async function copyLink() {
@@ -88,8 +172,31 @@
       `<option value="${b.id}"${b.id === batch.id ? ' selected' : ''}>${escapeHtml(batchName(b))}</option>`).join('');
     picker.addEventListener('change', () => {
       batch = batches.find(b => b.id === Number(picker.value));
-      history.replaceState(null, '', `?batch=${batch.id}`);
+      updateUrl();
       render(farmsById, hivesById);
+    });
+
+    // Print settings: from the address if given, otherwise one label
+    const params = new URLSearchParams(location.search);
+    sheet.pick.innerHTML = Object.entries(SHEETS)
+      .map(([key, layout]) => `<option value="${key}">${escapeHtml(layout.name)}</option>`).join('');
+    sheet.pick.value = SHEETS[params.get('sheet')] ? params.get('sheet') : 'single';
+    if (params.has('count')) sheet.count.value = clamp(params.get('count'), 1, MAX_LABELS);
+    if (params.has('start')) sheet.start.value = clamp(params.get('start'), 1, SHEETS[sheet.pick.value].perPage);
+
+    const onSettings = () => { updateSheets(); updateUrl(); };
+    sheet.pick.addEventListener('change', () => {
+      sheet.start.max = SHEETS[sheet.pick.value].perPage;
+      onSettings();
+    });
+    [sheet.count, sheet.start].forEach(input => {
+      input.addEventListener('input', onSettings);
+      // Tidy an out-of-range or empty box when leaving it, so what shows is what prints
+      input.addEventListener('change', () => {
+        const { count, start } = sheetChoice();
+        sheet.count.value = count;
+        sheet.start.value = start;
+      });
     });
 
     document.getElementById('printLabel').addEventListener('click', () => window.print());

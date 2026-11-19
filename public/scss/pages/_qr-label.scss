@@ -1,4 +1,4 @@
-// QR label page (qr-label.html). DRAFT: one label on plain paper.
+// QR label page (qr-label.html, HC-70): one label on plain paper, or a page of labels.
 
 // The label: same look as the sample on the Find your honey page
 .qr-label {
@@ -89,5 +89,84 @@
     &__scan { font-size: 7pt; }
     &__id { font-size: 10pt; }
     &__honey { font-size: 7.5pt; }
+  }
+}
+
+// ---- A page of labels (HC-70) ----
+// js/qr-label.js builds .qr-sheets at the end of <body>; it only shows when printing.
+
+.qr-actions__summary {
+  margin: 0 0 1rem;
+  font-size: .875rem;
+  color: $ink-soft;
+}
+
+// Small map of the first page: used spots, label spots, and spots left blank
+.qr-sheet-map {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 3), 1.6rem);
+  gap: .3rem;
+
+  &__spot {
+    height: 2.05rem;
+    border: 1px solid $line;
+    border-radius: .3rem;
+    background: #fff;
+
+    &.is-label { background: rgba($amber, .2); border-color: $amber; }
+    &.is-used { border-style: dashed; background: none; }
+  }
+}
+
+.qr-sheets { display: none; }
+
+// Letter pages with a quarter-inch margin, for the sheet layouts below
+@page qr-sheet {
+  size: letter;
+  margin: .25in;
+}
+
+@media print {
+  // Printing a page of labels: only the sheets, in normal page flow, on white (no cream page to waste ink)
+  body.qr-print-sheet {
+    display: block;
+    min-height: 0;
+    background: #fff;
+
+    > *:not(.qr-sheets) { display: none !important; }
+  }
+
+  body.qr-print-sheet .qr-sheets {
+    display: block;
+
+    &,
+    * { visibility: visible; }
+  }
+
+  .qr-sheet {
+    page: qr-sheet;
+    display: grid;
+    break-after: page;
+
+    &:last-child { break-after: auto; }
+  }
+
+  // Letter page, 9 labels to cut out: 3 x 3 cells of 2.5 x 3.25 in with quarter-inch gaps
+  // (8 x 10.25 in, inside the 8 x 10.5 in printable area)
+  .qr-sheet--letter9 {
+    grid-template-columns: repeat(3, 2.5in);
+    grid-auto-rows: 3.25in;
+    gap: .25in;
+  }
+
+  // Each label fills its cell; the single-label rules above position the preview, not these
+  .qr-sheet .qr-label {
+    position: static;
+    width: auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    break-inside: avoid;
   }
 }
