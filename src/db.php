@@ -18,5 +18,6 @@ try {
     ]);
 } catch (PDOException $e) {
     error_log($e->getMessage());
+    send(['error' => 'Server error'], 500);
     exit('Database connection failed.');
 }
