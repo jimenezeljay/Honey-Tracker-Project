@@ -1,4 +1,5 @@
 <?php
+//This file contains the code to connect to the database using PDO.
 $env = parse_ini_file(__DIR__ . '/../.env');
 
 if ($env === false) {
