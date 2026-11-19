@@ -168,4 +168,8 @@ const QR_STEPS = [
 
   window.addEventListener('hashchange', applyHash);
   applyHash();
+
+  // The definition bar always shows (it sits above the tiles), so start on Certified
+  // unless the URL already picked a label. Keeps the tiles from jumping on first tap.
+  if (!tiles.querySelector('[aria-pressed="true"]')) selectTerm('certified', false);
 })();

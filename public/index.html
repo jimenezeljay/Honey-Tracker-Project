@@ -34,8 +34,8 @@
       </div>
 
       <div class="home-map">
-        <!-- Real map (js/home.js + js/maps.js). Pin = exact hive; dashed area = a keeper who
-             only shares an approximate location. Search opens the Map page: map.html?q=... -->
+        <!-- Real map (js/home.js + js/maps.js). One dot per hive (or one rounded
+             dot for keepers who keep their spot private). Search opens the Map page: map.html?q=... -->
         <div class="map-box home-map__box">
           <div class="home-map__canvas" id="homeMap" aria-label="Map of certified hives"></div>
           <form class="map-search search-pill search-pill--sm" role="search" action="map.html" method="get">
@@ -44,8 +44,8 @@
             <input class="form-control" id="mapSearch" name="q" type="search" placeholder="Search this map">
           </form>
           <div class="map-legend">
-            <span><i class="key-pin"></i>Exact hive</span>
-            <span><i class="key-area"></i>Approximate area</span>
+            <span><i class="key-pin"></i>Hive</span>
+            <span class="map-legend__note">Locations may not be exact</span>
           </div>
         </div>
       </div>

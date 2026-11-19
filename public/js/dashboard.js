@@ -8,14 +8,12 @@ function formatDate(isoDate) {
 }
 
 // The keeper's own farms on the real map (js/maps.js): a pin and forage circle per hive
-// at exact farms, one dashed area at approximate farms (they never reveal their hive spots).
+// at exact farms, one rounded dot at approximate farms (they never reveal their hive spots).
 function apiaryMap(farms) {
   const hasExact = farms.some(farm => farm.precision === 'exact');
-  const hasArea = farms.some(farm => farm.precision !== 'exact');
-  const legend = [
-    hasExact ? '<span><i class="key-pin"></i>Hive</span><span><i class="key-radius"></i>Forage area</span>' : '',
-    hasArea ? '<span><i class="key-area"></i>Approximate area</span>' : ''
-  ].join('');
+  const legend = '<span><i class="key-pin"></i>Hive</span>'
+    + (hasExact ? '<span><i class="key-radius"></i>Forage area</span>' : '')
+    + '<span class="map-legend__note">Locations may not be exact</span>';
 
   return `
     <div class="map-box dash-map">
@@ -33,8 +31,8 @@ function drawApiaryMap(farms, hives) {
   if (!map) return;
 
   const layers = farms.flatMap(farm => {
-    const { markers, circles, areas, exact } = HTMap.farmMarkers(farm, { hives: hives.filter(hive => hive.farmId === farm.id) });
-    return exact ? [...circles, ...markers] : areas;
+    const { markers, circles } = HTMap.farmMarkers(farm, { hives: hives.filter(hive => hive.farmId === farm.id) });
+    return [...circles, ...markers];
   });
   const group = L.featureGroup(layers).addTo(map);
   map.fitBounds(group.getBounds(), { padding: [24, 24], maxZoom: 12 });

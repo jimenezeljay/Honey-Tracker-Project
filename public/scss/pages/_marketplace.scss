@@ -85,6 +85,9 @@
 
 .market-near {
   margin-bottom: 1.25rem;
+
+  // "Use my location": readable amber (was plain amber, 2.1:1 on cream)
+  .btn-link { color: $amber-deep; font-weight: 600; }
 }
 
 // Filters: white slide-in sheet from the left

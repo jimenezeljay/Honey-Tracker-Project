@@ -4,9 +4,10 @@
 //   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 //   <script src="js/maps.js"></script>
 //
-// Privacy rule (10/2 meeting): a farm with precision 'approximate' only ever shows a
-// dashed area, never a pin. The backend should send those farms' coordinates already
-// rounded, so the real spot never reaches the browser.
+// Privacy rule (10/2 meeting): a farm with precision 'approximate' shows one hive dot at
+// a rounded spot, never its real hives. The backend should send those farms' coordinates
+// already rounded, so the real spot never reaches the browser. Every map's legend says
+// locations may not be exact (Nov 12).
 //
 // Tiles come from tile.openstreetmap.org, which is free for light use with the
 // attribution shown in the corner. If traffic grows, swap TILE_URL for a paid or
@@ -16,7 +17,7 @@ const HTMap = (function () {
   const TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
   const ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
   const METERS_PER_MILE = 1609.34;
-  const AREA_MILES = 3; // size of the dashed area for approximate farms
+  const AREA_MILES = 3; // add-farm wizard preview only (Eljay's page)
 
   // Colors match scss/_variables.scss
   const AMBER = '#E0A030';
@@ -40,7 +41,7 @@ const HTMap = (function () {
     return map;
   }
 
-  // An exact hive pin
+  // A hive dot
   function pin(lat, lng, title) {
     return L.marker([lat, lng], {
       title,
@@ -59,17 +60,8 @@ const HTMap = (function () {
     });
   }
 
-  // Approximate farm, zoomed out: a dashed ring that stays the same size on screen
-  function areaIcon(lat, lng, title) {
-    return L.marker([lat, lng], {
-      title,
-      alt: title,
-      keyboard: true,
-      icon: L.divIcon({ className: 'ht-area', iconSize: [28, 28], iconAnchor: [14, 14] })
-    });
-  }
-
-  // Approximate farm, zoomed in: the real dashed area on the ground
+  // Dashed area. Shopper maps don't use this anymore (Nov 12: one dot + "may not be exact");
+  // only the add-farm wizard's preview still does, until Eljay updates it.
   function area(lat, lng, title) {
     return L.circle([lat, lng], {
       radius: AREA_MILES * METERS_PER_MILE,
@@ -78,18 +70,12 @@ const HTMap = (function () {
   }
 
   // Everything for one farm:
-  //   markers  pins (exact hives) or one dashed ring (approximate farm); clickable, clusterable
+  //   markers  a pin per hive (exact farm) or one dot at the rounded spot (approximate farm)
   //   circles  forage circles around exact hives (when radii is true)
-  //   areas    the real dashed area of an approximate farm (draw when zoomed in)
   //   hives: which hives to show (the product page passes just the batch's hives)
   function farmMarkers(farm, { hives = farm.hives, radii = true } = {}) {
     if (farm.precision !== 'exact') {
-      return {
-        markers: [areaIcon(farm.lat, farm.lng, farm.name)],
-        circles: [],
-        areas: [area(farm.lat, farm.lng, farm.name)],
-        exact: false
-      };
+      return { markers: [pin(farm.lat, farm.lng, farm.name)], circles: [], exact: false };
     }
     const shown = (hives || []).filter(h => h && h.lat != null);
     const markers = (shown.length ? shown : [farm]).map(h =>
@@ -97,7 +83,7 @@ const HTMap = (function () {
     const circles = radii
       ? shown.map(h => forage(h.lat, h.lng, h.forageRadiusMi))
       : [];
-    return { markers, circles, areas: [], exact: true };
+    return { markers, circles, exact: true };
   }
 
   // Leaflet measures its box once; call this after a map's container changes size
@@ -106,5 +92,5 @@ const HTMap = (function () {
     if (map) setTimeout(() => map.invalidateSize(), 0);
   }
 
-  return { create, pin, forage, area, areaIcon, farmMarkers, refresh, AMBER, SAGE };
+  return { create, pin, forage, area, farmMarkers, refresh, AMBER, SAGE };
 })();

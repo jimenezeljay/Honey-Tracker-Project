@@ -1,4 +1,4 @@
-// Homepage map: every farm, pins for exact hives and dashed areas for approximate ones.
+// Homepage map: every farm as hive dots (approximate farms get one rounded dot).
 // Clicking one opens it on the Map page. Needs js/maps.js and js/data.js.
 
 (async function () {

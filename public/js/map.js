@@ -44,7 +44,7 @@
       });
     }
   }).addTo(map);
-  const forageLayer = L.layerGroup().addTo(map); // forage circles + approximate areas, zoomed in only
+  const forageLayer = L.layerGroup().addTo(map); // forage circles, zoomed in only
 
   const farms = await getFarms();
   const params = new URLSearchParams(window.location.search);
@@ -87,7 +87,6 @@
     if (map.getZoom() >= FORAGE_MIN_ZOOM) {
       shown.forEach(farm => {
         const parts = built.get(farm.id);
-        if (ui.hives.checked) parts.areas.forEach(a => forageLayer.addLayer(a));
         if (ui.forage.checked) parts.circles.forEach(c => forageLayer.addLayer(c));
       });
     }
@@ -126,9 +125,9 @@
   function openFarm(farm, { zoom = true } = {}) {
     if (zoom) {
       // Circles can't measure themselves until they're on the map, so use center + radius
-      const { markers, circles, areas } = built.get(farm.id);
+      const { markers, circles } = built.get(farm.id);
       const bounds = L.latLngBounds([]);
-      [...markers, ...circles, ...areas].forEach(layer => {
+      [...markers, ...circles].forEach(layer => {
         const radius = layer.getRadius ? layer.getRadius() : 0;
         bounds.extend(radius ? layer.getLatLng().toBounds(radius * 2) : layer.getLatLng());
       });
@@ -154,7 +153,7 @@
       <h2 class="farm-card__name" tabindex="-1">${escapeHtml(farm.name)}</h2>
       <p class="farm-card__keeper">Keeper: ${escapeHtml(farm.keeper?.displayName)}</p>
       ${badges ? `<div class="farm-card__badges">${badges}</div>` : ''}
-      ${farm.precision === 'exact' ? '' : '<p class="farm-card__note">Approximate area, to protect the hives.</p>'}
+      ${farm.precision === 'exact' ? '' : '<p class="farm-card__note">Location may not be exact, to protect the hives.</p>'}
       ${honey ? `<h3 class="map-label">Honey from this farm</h3><ul class="farm-card__honey">${honey}</ul>` : ''}`;
     ui.card.hidden = false;
     ui.card.querySelector('.farm-card__name').focus({ preventScroll: true });

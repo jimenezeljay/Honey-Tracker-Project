@@ -19,6 +19,12 @@ const API_BASE = '';
 // fine for testing, but no real labels get handed out before the domain is live.
 const SITE_URL = 'https://jimenezeljay.github.io/Honey-Tracker-Project/';
 
+// Stripe publishable key for Checkout. TEST MODE ONLY until the backend can take orders:
+// paste a key that starts with pk_test_ (it's safe in public code; the secret key never is).
+// Empty = the card form shows a short setup note instead. Switch to pk_live_ only after
+// POST /api/orders exists on the real server and the site runs on HTTPS.
+const STRIPE_PUBLISHABLE_KEY = '';
+
 // Every name, farm and number here is invented sample data.
 // Units match the wireframes: prices in USD, harvests in lb, jars in oz.
 
@@ -455,4 +461,28 @@ function qrLink(batch) {
 // Always the site-wide batch id, never the keeper's own batchNumber (two keepers can both have "0001").
 function batchCode(batch) {
   return `HT-${String(batch.id).padStart(4, '0')}`;
+}
+
+// ---- Orders (Checkout) ----
+
+// Estimated service fee: Mr. Gallic's "$1 + credit card fee", using Stripe's standard US card
+// rate (2.9% + 30¢), once per order. Shared by Cart and Checkout so both show the same number.
+// The server works out the real fee; this is only an estimate until Jira HC-110 is answered.
+const SERVICE_FEE = { flatCents: 100, cardRate: 0.029, cardFixedCents: 30 };
+function estimateServiceFeeCents(beforeFeeCents) {
+  if (beforeFeeCents <= 0) return 0;
+  return SERVICE_FEE.flatCents + Math.round(beforeFeeCents * SERVICE_FEE.cardRate) + SERVICE_FEE.cardFixedCents;
+}
+
+// Place an order. Pretend for now: nothing is charged or sent anywhere.
+// Later (POST /api/orders, see docs/api-contract.md):
+//   const res = await fetch(API_BASE + '/api/orders', {
+//     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(order)
+//   });
+//   if (!res.ok) throw new Error('Order failed');
+//   return res.json();
+// The server re-checks every price, stock level and keeper status, works out the total itself,
+// then charges the card with Stripe using order.payment.confirmationTokenId.
+async function placeOrder(order) {
+  return { orderId: `TEST-${Date.now().toString().slice(-6)}`, status: 'test' };
 }
